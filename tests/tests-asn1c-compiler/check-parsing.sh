@@ -31,9 +31,9 @@ for ref in ${top_srcdir}/tests/tests-asn1c-compiler/*.asn1.-*; do
 	template=.tmp.check-parsing.$$
 	oldversion=${template}.old
 	newversion=${template}.new
-	LANG=C sed -e 's/^found in .*/found in .../' < "$ref" > "$oldversion"
-	ec=0
-	(${top_builddir}/asn1c/asn1c -S ${top_srcdir}/skeletons -no-gen-OER -no-gen-PER "-$flags" "$src" | LANG=C sed -e 's/^found in .*/found in .../' > "$newversion") || ec=$?
+	PROCESSING="$ref (from $src)"
+	LC_ALL=C sed -e 's/^found in .*/found in .../' < "$ref" > "$oldversion"
+	(${top_builddir}/asn1c/asn1c -S ${top_srcdir}/skeletons "-$flags" "$src" | LC_ALL=C sed -e 's/^found in .*/found in .../' > "$newversion") || ec=$?
 	if [ $? = 0 ]; then
 		diff $diffArgs "$oldversion" "$newversion" || ec=$?
 	fi

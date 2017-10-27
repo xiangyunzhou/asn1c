@@ -37,6 +37,7 @@ before_install:
         brew install lcov;
     fi
 script:
+  - export
   - autoreconf -iv
   - ./configure $CONFIG_FLAGS
   - make $TASK
