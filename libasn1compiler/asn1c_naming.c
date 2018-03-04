@@ -283,6 +283,7 @@ c_presence_name(arg_t *arg, asn1p_expr_t *expr) {
 
     abuf_clear(&ab);
 
+    abuf_str(&ab, asn1c_prefix());
     if(expr) {
         /* NB: do not use part_name, doesn't work for -fcompound-names */
         abuf_str(&ab, c_name_impl(arg, arg->expr, 0).base_name);
