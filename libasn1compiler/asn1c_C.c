@@ -1237,7 +1237,7 @@ asn1c_lang_C_type_REFERENCE_Value(arg_t *arg) {
 	if((ref_type->expr_type == ASN_BASIC_INTEGER) ||
 		(ref_type->expr_type == ASN_BASIC_ENUMERATED)) {
 		OUT("#define %s_", MKID(ref_type));
-		OUT("%s\t", MKID(expr));
+		OUT("%s\t", c_name(arg).base_name);
 		OUT("((%s)", asn1c_type_name(arg, expr, TNF_CTYPE));
 		OUT("%s)\n", asn1p_itoa(expr->value->value.v_integer));
 	}
