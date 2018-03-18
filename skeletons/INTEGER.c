@@ -778,6 +778,14 @@ INTEGER_encode_uper(const asn_TYPE_descriptor_t *td,
 		ASN_DEBUG("Encoding integer %ld (%lu) with range %d bits",
 			value, value - ct->lower_bound, ct->range_bits);
 	if(specs && specs->field_unsigned) {
+		if (  ((unsigned long)ct->lower_bound > (unsigned long)(ct->upper_bound)
+		   || ((unsigned long)value < (unsigned long)ct->lower_bound))
+		   || ((unsigned long)value > (unsigned long)ct->upper_bound)
+		) {
+			ASN_DEBUG("Value %lu to-be-encoded is outside the bounds [%lu, %lu]!",
+				value, ct->lower_bound, ct->upper_bound);
+			ASN__ENCODE_FAILED;
+		}
  		v = (unsigned long)value - (unsigned long)ct->lower_bound;
  	} else {
  		if(per_long_range_rebase(value, ct->lower_bound, ct->upper_bound, &v)) {
