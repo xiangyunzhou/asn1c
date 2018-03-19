@@ -64,8 +64,8 @@ INTEGER_encode_der(const asn_TYPE_descriptor_t *td, const void *sptr,
                    int tag_mode, ber_tlv_tag_t tag, asn_app_consume_bytes_f *cb,
                    void *app_key) {
     const INTEGER_t *st = (const INTEGER_t *)sptr;
-    asn_enc_rval_t rval = {0,0};
-    INTEGER_t effective_integer = {0,0};
+    asn_enc_rval_t rval = {0};
+    INTEGER_t effective_integer = {0};
 
 	ASN_DEBUG("%s %s as INTEGER (tm=%d)",
 		cb?"Encoding":"Estimating", td->name, tag_mode);
