@@ -61,10 +61,10 @@ asn_dec_rval_t
 BOOLEAN_decode_ber(const asn_codec_ctx_t *opt_codec_ctx,
                    const asn_TYPE_descriptor_t *td, void **bool_value,
                    const void *buf_ptr, size_t size, int tag_mode) {
-	BOOLEAN_t *st = (BOOLEAN_t *)*bool_value;
-	asn_dec_rval_t rval  = {0};
-	ber_tlv_len_t length = 0;
-	ber_tlv_len_t lidx   = 0;
+    BOOLEAN_t *st = (BOOLEAN_t *)*bool_value;
+	asn_dec_rval_t rval;
+	ber_tlv_len_t length;
+	ber_tlv_len_t lidx;
 
 	if(st == NULL) {
 		st = (BOOLEAN_t *)(*bool_value = CALLOC(1, sizeof(*st)));
@@ -123,7 +123,7 @@ asn_enc_rval_t
 BOOLEAN_encode_der(const asn_TYPE_descriptor_t *td, const void *sptr,
                    int tag_mode, ber_tlv_tag_t tag, asn_app_consume_bytes_f *cb,
                    void *app_key) {
-    asn_enc_rval_t erval = {0};
+    asn_enc_rval_t erval;
     const BOOLEAN_t *st = (const BOOLEAN_t *)sptr;
 
     erval.encoded = der_write_tags(td, 1, tag_mode, 0, tag, cb, app_key);
@@ -158,7 +158,7 @@ BOOLEAN_encode_der(const asn_TYPE_descriptor_t *td, const void *sptr,
 static enum xer_pbd_rval
 BOOLEAN__xer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
                          const void *chunk_buf, size_t chunk_size) {
-	BOOLEAN_t *st = (BOOLEAN_t *)sptr;
+    BOOLEAN_t *st = (BOOLEAN_t *)sptr;
 	const char *p = (const char *)chunk_buf;
 
 	(void)td;
@@ -222,8 +222,8 @@ int
 BOOLEAN_print(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
               asn_app_consume_bytes_f *cb, void *app_key) {
     const BOOLEAN_t *st = (const BOOLEAN_t *)sptr;
-	const char *buf = NULL;
-	size_t buflen = 0;
+	const char *buf;
+	size_t buflen;
 
 	(void)td;	/* Unused argument */
 	(void)ilevel;	/* Unused argument */
@@ -268,11 +268,11 @@ BOOLEAN_decode_uper(const asn_codec_ctx_t *opt_codec_ctx,
                     const asn_TYPE_descriptor_t *td,
                     const asn_per_constraints_t *constraints, void **sptr,
                     asn_per_data_t *pd) {
-	asn_dec_rval_t rv = {0};
+    asn_dec_rval_t rv;
 	BOOLEAN_t *st = (BOOLEAN_t *)*sptr;
 
 	(void)opt_codec_ctx;
-	(void)td;
+    (void)td;
 	(void)constraints;
 
 	if(!st) {
@@ -301,7 +301,7 @@ asn_enc_rval_t
 BOOLEAN_encode_uper(const asn_TYPE_descriptor_t *td,
                     const asn_per_constraints_t *constraints, const void *sptr,
                     asn_per_outp_t *po) {
-	const BOOLEAN_t *st = (const BOOLEAN_t *)sptr;
+    const BOOLEAN_t *st = (const BOOLEAN_t *)sptr;
 	asn_enc_rval_t er = { 0, 0, 0 };
 
 	(void)constraints;
@@ -317,7 +317,7 @@ BOOLEAN_encode_uper(const asn_TYPE_descriptor_t *td,
 asn_dec_rval_t
 BOOLEAN_decode_aper(const asn_codec_ctx_t *opt_codec_ctx, const asn_TYPE_descriptor_t *td,
                     const asn_per_constraints_t *constraints, void **sptr, asn_per_data_t *pd) {
-	asn_dec_rval_t rv = {0};
+	asn_dec_rval_t rv;
 	BOOLEAN_t *st = (BOOLEAN_t *)*sptr;
 
 	(void)opt_codec_ctx;
@@ -356,7 +356,7 @@ BOOLEAN_encode_aper(const asn_TYPE_descriptor_t *td,
                     const asn_per_constraints_t *constraints,
                     const void *sptr, asn_per_outp_t *po) {
 	const BOOLEAN_t *st = (const BOOLEAN_t *)sptr;
-	asn_enc_rval_t er = {0};
+	asn_enc_rval_t er;
 
 	(void)constraints;
 
@@ -398,7 +398,7 @@ BOOLEAN_decode_oer(const asn_codec_ctx_t *opt_codec_ctx,
                    const asn_oer_constraints_t *constraints, void **sptr,
                    const void *ptr, size_t size) {
     asn_dec_rval_t ok = {RC_OK, 1};
-    BOOLEAN_t *st = NULL;
+    BOOLEAN_t *st;
 
     (void)opt_codec_ctx;
     (void)td;
