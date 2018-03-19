@@ -64,8 +64,8 @@ INTEGER_encode_der(const asn_TYPE_descriptor_t *td, const void *sptr,
                    int tag_mode, ber_tlv_tag_t tag, asn_app_consume_bytes_f *cb,
                    void *app_key) {
     const INTEGER_t *st = (const INTEGER_t *)sptr;
-    asn_enc_rval_t rval;
-    INTEGER_t effective_integer;
+    asn_enc_rval_t rval = {0};
+    INTEGER_t effective_integer = {0};
 
 	ASN_DEBUG("%s %s as INTEGER (tm=%d)",
 		cb?"Encoding":"Estimating", td->name, tag_mode);
@@ -77,7 +77,7 @@ INTEGER_encode_der(const asn_TYPE_descriptor_t *td, const void *sptr,
 	if(st->buf) {
 		uint8_t *buf = st->buf;
 		uint8_t *end1 = buf + st->size - 1;
-		int shift;
+		int shift = 0;
 
 		/* Compute the number of superfluous leading bytes */
 		for(; buf < end1; buf++) {
@@ -102,16 +102,16 @@ INTEGER_encode_der(const asn_TYPE_descriptor_t *td, const void *sptr,
 		/* Remove leading superfluous bytes from the integer */
 		shift = buf - st->buf;
 		if(shift) {
-            union {
-                const uint8_t *c_buf;
-                uint8_t *nc_buf;
-            } unconst;
-            unconst.c_buf = st->buf;
-            effective_integer.buf = unconst.nc_buf + shift;
-            effective_integer.size = st->size - shift;
+			union {
+				const uint8_t *c_buf;
+				uint8_t *nc_buf;
+            		} unconst;
+            		unconst.c_buf = st->buf;
+            		effective_integer.buf = unconst.nc_buf + shift;
+            		effective_integer.size = st->size - shift;
 
-            st = &effective_integer;
-        }
+            		st = &effective_integer;
+        	}
     }
 
     rval = der_encode_primitive(td, st, tag_mode, tag, cb, app_key);
@@ -135,10 +135,10 @@ INTEGER__dump(const asn_TYPE_descriptor_t *td, const INTEGER_t *st, asn_app_cons
 	char scratch[32];
 	uint8_t *buf = st->buf;
 	uint8_t *buf_end = st->buf + st->size;
-	intmax_t value;
+	intmax_t value = 0;
 	ssize_t wrote = 0;
-	char *p;
-	int ret;
+	char *p = NULL;
+	int ret = -1;
 
 	if(specs && specs->field_unsigned)
 		ret = asn_INTEGER2umax(st, (uintmax_t *)&value);
@@ -209,7 +209,7 @@ int
 INTEGER_print(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
               asn_app_consume_bytes_f *cb, void *app_key) {
     const INTEGER_t *st = (const INTEGER_t *)sptr;
-	ssize_t ret;
+	ssize_t ret = -1;
 
 	(void)ilevel;
 
