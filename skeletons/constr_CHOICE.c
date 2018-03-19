@@ -561,9 +561,9 @@ CHOICE_decode_xer(const asn_codec_ctx_t *opt_codec_ctx,
 	void *st = *struct_ptr;	/* Target structure. */
 	asn_struct_ctx_t *ctx;	/* Decoder context */
 
-	asn_dec_rval_t rval = {0};		/* Return value of a decoder */
+	asn_dec_rval_t rval;		/* Return value of a decoder */
 	ssize_t consumed_myself = 0;	/* Consumed bytes from ptr */
-	size_t edx = 0;			/* Element index */
+	size_t edx;			/* Element index */
 
 	/*
 	 * Create the target structure if it is not present already.
@@ -781,8 +781,8 @@ CHOICE_encode_xer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
                   void *app_key) {
     const asn_CHOICE_specifics_t *specs =
         (const asn_CHOICE_specifics_t *)td->specifics;
-    asn_enc_rval_t er = {0};
-	unsigned present = 0;
+    asn_enc_rval_t er;
+	unsigned present;
 
 	if(!sptr)
 		ASN__ENCODE_FAILED;
@@ -836,13 +836,13 @@ CHOICE_decode_uper(const asn_codec_ctx_t *opt_codec_ctx,
                    asn_per_data_t *pd) {
     const asn_CHOICE_specifics_t *specs =
         (const asn_CHOICE_specifics_t *)td->specifics;
-    asn_dec_rval_t rv = {0};
+    asn_dec_rval_t rv;
 	const asn_per_constraint_t *ct;
-	asn_TYPE_member_t *elm = {0};	/* CHOICE's element */
-	void *memb_ptr = NULL;
-	void **memb_ptr2 = NULL;
+	asn_TYPE_member_t *elm;	/* CHOICE's element */
+	void *memb_ptr;
+	void **memb_ptr2;
 	void *st = *sptr;
-	int value = 0;
+	int value;
 
 	if(ASN__STACK_OVERFLOW_CHECK(opt_codec_ctx))
 		ASN__DECODE_FAILED;
@@ -921,11 +921,11 @@ CHOICE_encode_uper(const asn_TYPE_descriptor_t *td,
                    const asn_per_constraints_t *constraints, const void *sptr,
                    asn_per_outp_t *po) {
     const asn_CHOICE_specifics_t *specs = (const asn_CHOICE_specifics_t *)td->specifics;
-	asn_TYPE_member_t *elm = {0};	/* CHOICE's element */
+	asn_TYPE_member_t *elm;	/* CHOICE's element */
 	const asn_per_constraint_t *ct;
-	const void *memb_ptr = NULL;
-	unsigned present = 0;
-	int present_enc = 0;
+	const void *memb_ptr;
+	unsigned present;
+	int present_enc;
 
 	if(!sptr) ASN__ENCODE_FAILED;
 
@@ -1015,13 +1015,13 @@ CHOICE_decode_aper(const asn_codec_ctx_t *opt_codec_ctx,
                    const asn_TYPE_descriptor_t *td,
                    const asn_per_constraints_t *constraints, void **sptr, asn_per_data_t *pd) {
 	const asn_CHOICE_specifics_t *specs = (const asn_CHOICE_specifics_t *)td->specifics;
-	asn_dec_rval_t rv = {0};
+	asn_dec_rval_t rv;
 	const asn_per_constraint_t *ct;
-	asn_TYPE_member_t *elm = {0};	/* CHOICE's element */
-	void *memb_ptr = NULL;
-	void **memb_ptr2 = NULL;
+	asn_TYPE_member_t *elm;	/* CHOICE's element */
+	void *memb_ptr;
+	void **memb_ptr2;
 	void *st = *sptr;
-	int value = 0;
+	int value;
 
 	if(ASN__STACK_OVERFLOW_CHECK(opt_codec_ctx))
 		ASN__DECODE_FAILED;
@@ -1098,10 +1098,10 @@ CHOICE_encode_aper(const asn_TYPE_descriptor_t *td,
                    const asn_per_constraints_t *constraints,
                    const void *sptr, asn_per_outp_t *po) {
 	const asn_CHOICE_specifics_t *specs = (const asn_CHOICE_specifics_t *)td->specifics;
-	const asn_TYPE_member_t *elm = {0}; /* CHOICE's element */
+	const asn_TYPE_member_t *elm; /* CHOICE's element */
 	const asn_per_constraint_t *ct;
-	const void *memb_ptr = NULL;
-	int present = 0;
+	const void *memb_ptr;
+	int present;
 
 	if(!sptr) ASN__ENCODE_FAILED;
 
@@ -1180,7 +1180,7 @@ int
 CHOICE_print(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
              asn_app_consume_bytes_f *cb, void *app_key) {
     const asn_CHOICE_specifics_t *specs = (const asn_CHOICE_specifics_t *)td->specifics;
-	unsigned present = 0;
+	unsigned present;
 
 	if(!sptr) return (cb("<absent>", 8, app_key) < 0) ? -1 : 0;
 
@@ -1222,7 +1222,7 @@ CHOICE_free(const asn_TYPE_descriptor_t *td, void *ptr,
             enum asn_struct_free_method method) {
     const asn_CHOICE_specifics_t *specs =
         (const asn_CHOICE_specifics_t *)td->specifics;
-    unsigned present = 0;
+    unsigned present;
 
 	if(!td || !ptr)
 		return;
@@ -1276,8 +1276,8 @@ CHOICE_free(const asn_TYPE_descriptor_t *td, void *ptr,
 static unsigned
 _fetch_present_idx(const void *struct_ptr, unsigned pres_offset,
                    unsigned pres_size) {
-    const void *present_ptr = NULL;
-	unsigned present = 0;
+    const void *present_ptr;
+	unsigned present;
 
 	present_ptr = ((const char *)struct_ptr) + pres_offset;
 
@@ -1354,8 +1354,8 @@ _get_member_ptr(const asn_TYPE_descriptor_t *td, const void *sptr,
 
 int
 CHOICE_compare(const asn_TYPE_descriptor_t *td, const void *aptr, const void *bptr) {
-    asn_TYPE_member_t *aelm = NULL;
-    asn_TYPE_member_t *belm = NULL;
+    asn_TYPE_member_t *aelm;
+    asn_TYPE_member_t *belm;
     unsigned apresent = 0;
     unsigned bpresent = 0;
     const void *amember = _get_member_ptr(td, aptr, &aelm, &apresent);
