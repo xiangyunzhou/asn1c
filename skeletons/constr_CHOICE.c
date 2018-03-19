@@ -561,7 +561,7 @@ CHOICE_decode_xer(const asn_codec_ctx_t *opt_codec_ctx,
 	void *st = *struct_ptr;	/* Target structure. */
 	asn_struct_ctx_t *ctx;	/* Decoder context */
 
-	asn_dec_rval_t rval = {0,0,0};		/* Return value of a decoder */
+	asn_dec_rval_t rval = {0};		/* Return value of a decoder */
 	ssize_t consumed_myself = 0;	/* Consumed bytes from ptr */
 	size_t edx = 0;			/* Element index */
 
