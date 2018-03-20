@@ -246,7 +246,7 @@ GeneralizedTime_encode_der(const asn_TYPE_descriptor_t *td, const void *sptr,
                            int tag_mode, ber_tlv_tag_t tag,
                            asn_app_consume_bytes_f *cb, void *app_key) {
     GeneralizedTime_t *st;
-	asn_enc_rval_t erval;
+	asn_enc_rval_t erval = {0,0,0};
 	int fv, fd;	/* seconds fraction value and number of digits */
 	struct tm tm;
 	time_t tloc;

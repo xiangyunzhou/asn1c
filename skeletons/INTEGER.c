@@ -571,7 +571,7 @@ INTEGER_encode_xer(const asn_TYPE_descriptor_t *td, const void *sptr,
                    int ilevel, enum xer_encoder_flags_e flags,
                    asn_app_consume_bytes_f *cb, void *app_key) {
     const INTEGER_t *st = (const INTEGER_t *)sptr;
-	asn_enc_rval_t er;
+	asn_enc_rval_t er = {0,0,0};
 
 	(void)ilevel;
 	(void)flags;
@@ -708,9 +708,9 @@ asn_enc_rval_t
 INTEGER_encode_uper(const asn_TYPE_descriptor_t *td,
                     const asn_per_constraints_t *constraints, const void *sptr,
                     asn_per_outp_t *po) {
-    const asn_INTEGER_specifics_t *specs =
-        (const asn_INTEGER_specifics_t *)td->specifics;
-    asn_enc_rval_t er;
+	const asn_INTEGER_specifics_t *specs =
+        	(const asn_INTEGER_specifics_t *)td->specifics;
+	asn_enc_rval_t er = {0,0,0};
 	const INTEGER_t *st = (const INTEGER_t *)sptr;
 	const uint8_t *buf;
 	const uint8_t *end;
@@ -973,7 +973,7 @@ INTEGER_encode_aper(const asn_TYPE_descriptor_t *td,
                     const asn_per_constraints_t *constraints,
                     const void *sptr, asn_per_outp_t *po) {
 	const asn_INTEGER_specifics_t *specs = (const asn_INTEGER_specifics_t *)td->specifics;
-	asn_enc_rval_t er;
+	asn_enc_rval_t er = {0,0,0};
 	const INTEGER_t *st = (const INTEGER_t *)sptr;
 	const uint8_t *buf;
 	const uint8_t *end;
