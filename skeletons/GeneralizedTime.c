@@ -613,7 +613,7 @@ asn_time2GT(GeneralizedTime_t *opt_gt, const struct tm *tm, int force_gmt) {
 GeneralizedTime_t *
 asn_time2GT_frac(GeneralizedTime_t *opt_gt, const struct tm *tm, int frac_value, int frac_digits, int force_gmt) {
 	struct tm tm_s;
-	long gmtoff;
+	long gmtoff = 0;
 	const unsigned int buf_size =
 		4 + 2 + 2	/* yyyymmdd */
 		+ 2 + 2 + 2	/* hhmmss */
@@ -621,9 +621,9 @@ asn_time2GT_frac(GeneralizedTime_t *opt_gt, const struct tm *tm, int frac_value,
 		+ 1 + 4		/* +hhmm */
 		+ 1		/* '\0' */
 		;
-	char *buf;
-	char *p;
-	int size;
+	char *buf = NULL;
+	char *p = NULL;
+	int size = 0;
 
 	/* Check arguments */
 	if(!tm) {
