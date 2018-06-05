@@ -115,10 +115,14 @@ OBJECT_IDENTIFIER_get_single_arc(const uint8_t *arcbuf, size_t arcbuf_len,
         return 0;
     } else {
         asn_oid_arc_t accum;
+	asn_oid_arc_t upper_limit = (ASN_OID_ARC_MAX >> 7);
+	/* When the value reaches "upper_limit", it can take */
+	/* at most one more digit. If it exceeds "upper_limit" */
+	/* but there are more digits - it's an Overflow condition */
         /* Gather all bits into the accumulator */
         for(accum = 0; b < arcend; b++) {
             accum = (accum << 7) | (*b & ~0x80);
-            if((*b & 0x80) == 0) {
+            if((*b & 0x80) == 0) { // no more digits
                 if(accum <= ASN_OID_ARC_MAX) {
                     *ret_value = accum;
                     return 1 + (b - arcbuf);
@@ -126,7 +130,12 @@ OBJECT_IDENTIFIER_get_single_arc(const uint8_t *arcbuf, size_t arcbuf_len,
                     errno = ERANGE; /* Overflow */
                     return -1;
                 }
-            }
+            } else { // to make sure we aren't wrapping around
+	      if(accum > upper_limit) {
+		    errno = ERANGE; /* Overflow */
+		    return -1;
+	      }
+	    }
         }
         errno = EINVAL;
         return -1;
