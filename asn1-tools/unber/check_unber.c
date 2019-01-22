@@ -1,6 +1,6 @@
+#include <stdint.h>
 #include "asn1_common.h"
 #include "libasn1_unber_tool.h"
-#include <stdint.h>
 
 
 // An abstraction for getting data from the in-memory buffer.
