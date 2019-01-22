@@ -151,7 +151,7 @@ process_deeper(const char *fname, input_stream_t *ibs, output_stream_t *os,
 
         if(limit >= 0 && tblen >= limit) {
             osprintfError(os,
-                          "%s: Too long TL sequence (%zd >= %zd) at %lld. "
+                          "%s: Too long TL sequence (%zd >= %zd) at %ld. "
                           "Broken or maliciously constructed file\n",
                           fname, tblen, limit, ibs->bytesRead(ibs));
             return PD_FAILED;
@@ -159,7 +159,7 @@ process_deeper(const char *fname, input_stream_t *ibs, output_stream_t *os,
 
         if(tblen >= (ssize_t)sizeof(tagbuf)) {
             osprintfError(os,
-                          "%s: Too long TL sequence (%zd bytes) at %lld. "
+                          "%s: Too long TL sequence (%zd bytes) at %ld. "
                           "Broken or maliciously constructed file\n",
                           fname, tblen, ibs->bytesRead(ibs));
             return PD_FAILED;
@@ -318,7 +318,7 @@ print_TL(output_stream_t *os, int fin, off_t offset, int level, int constr,
     osprintf(os, constr ? ((tlv_len == -1) ? "I" : "C") : "P");
 
     /* Print out the offset of this boundary, even if closing tag */
-    if(!minimalistic) osprintf(os, " O=\"%lld\"", offset);
+    if(!minimalistic) osprintf(os, " O=\"%ld\"", offset);
 
     osprintf(os, " T=\"%s\"", ber_tlv_tag_string(tlv_tag));
 
