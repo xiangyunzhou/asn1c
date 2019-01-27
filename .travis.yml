@@ -24,9 +24,6 @@ before_install:
 script:
   - autoreconf -iv
   - ./configure $CONFIG_FLAGS
-  - touch libasn1parser/*.h
-  - touch libasn1parser/*.l
-  - touch libasn1parser/*.y
   - make $TASK
 after_success:
   - test "x$CC" = "xgcc" -o "x$CC" = "xclang" && make code-coverage-capture && coveralls-lcov asn1c-*-coverage.info
