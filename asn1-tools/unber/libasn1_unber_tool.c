@@ -171,8 +171,8 @@ process_deeper(const char *fname, input_stream_t *ibs, output_stream_t *os,
             if(limit > 0 || expect_eoc) {
                 osprintfError(os,
                               "%s: Unexpected end of file (TL)"
-                              " at %zu\n",
-                              fname, (size_t)ibs->bytesRead(ibs));
+                              " at %lld\n",
+                              fname, (long long)ibs->bytesRead(ibs));
                 return PD_FAILED;
             } else {
                 return PD_EOF;
@@ -189,8 +189,8 @@ process_deeper(const char *fname, input_stream_t *ibs, output_stream_t *os,
         case -1:
             osprintfError(os,
                           "%s: Fatal error decoding tag"
-                          " at %zu\n",
-                          fname, (size_t)ibs->bytesRead(ibs));
+                          " at %lld\n",
+                          fname, (long long)ibs->bytesRead(ibs));
             return PD_FAILED;
         case 0:
             /* More data expected */
