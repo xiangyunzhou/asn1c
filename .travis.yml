@@ -9,7 +9,7 @@ os:
   - osx
 
 # Linux
-#dist: xenial
+dist: xenial
 sudo: required
 
 # OS X only supports one image. Use the latest.
@@ -26,9 +26,14 @@ matrix:
       
 before_install:
   - |
-    if [[ "$TRAVIS_OS_NAME" == Linux ]]; then
-      sudo apt-get install -y gcc-multilib lcov libasan*
-      gem install coveralls-lcov
+    if [[ "$BUILD_OS" == "linux" ]]; then
+        sudo apt-get install -y gcc-multilib lcov libasan* ;
+        gem install coveralls-lcov;
+    else
+        brew update;
+        brew uninstall libtool;
+        brew install libtool;
+        brew install lcov;
     fi
 script:
   - autoreconf -iv
