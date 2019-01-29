@@ -26,10 +26,11 @@ matrix:
       
 before_install:
   - |
-    if [[ "$BUILD_OS" == "linux" ]]; then
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         sudo apt-get install -y gcc-multilib lcov libasan* ;
         gem install coveralls-lcov;
-    else
+    fi
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         brew update;
         brew uninstall libtool;
         brew install libtool;
