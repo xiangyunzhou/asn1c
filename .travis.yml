@@ -9,7 +9,7 @@ os:
   - osx
 
 # Linux
-dist: xenial
+#dist: xenial
 sudo: required
 
 # OS X only supports one image. Use the latest.
@@ -18,9 +18,18 @@ osx_image: xcode10.1
 env:
   - TASK=check CONFIG_FLAGS="--enable-Werror --enable-test-Werror --enable-code-coverage"
   - TASK=distcheck
+
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
+      
 before_install:
-  - sudo apt-get install -y gcc-multilib lcov libasan*
-  - gem install coveralls-lcov
+  - |
+    if [[ "$TRAVIS_OS_NAME" == Linux ]]; then
+      sudo apt-get install -y gcc-multilib lcov libasan*
+      gem install coveralls-lcov
+    fi
 script:
   - autoreconf -iv
   - ./configure $CONFIG_FLAGS
