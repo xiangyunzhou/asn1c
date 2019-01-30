@@ -43,4 +43,5 @@ script:
 after_success:
   - test "x$CC" = "xgcc" -o "x$CC" = "xclang" && make code-coverage-capture && coveralls-lcov asn1c-*-coverage.info
 after_failure:
-  - find . -name test-suite.log -exec tail -v -n +1 {} +
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then find . -name test-suite.log -exec tail -v -n +1 {} + ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then find . -name test-suite.log -exec tail -n +1 {} + ; fi
