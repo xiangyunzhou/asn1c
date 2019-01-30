@@ -7,6 +7,9 @@
 #include "asn1parser.h"
 #include "asn1p_y.h"
 
+/* Workaround for https://github.com/vlm/asn1c/issues/321 */
+#pragma GCC diagnostic ignored "-Wsign-compare"
+
 int asn1p_lex(void);
 void asn1p_lexer_hack_push_opaque_state(void);		/* Used in .y */
 void asn1p_lexer_hack_enable_with_syntax(void);		/* Used in .y */
