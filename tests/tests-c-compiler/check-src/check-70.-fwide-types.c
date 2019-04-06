@@ -5,6 +5,7 @@
  * stream is checked against rules specified in ../data-70/README file.
  */
 #undef	NDEBUG
+#include <PDU.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -14,8 +15,6 @@
 #include <dirent.h>
 #include <assert.h>
 #include <errno.h>
-
-#include <PDU.h>
 
 #ifndef SRCDIR
 #define SRCDIR_S ".."
