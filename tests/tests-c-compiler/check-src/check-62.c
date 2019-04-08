@@ -1,4 +1,5 @@
 #undef	NDEBUG
+#include <T.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -7,8 +8,6 @@
 #include <dirent.h>
 #include <assert.h>
 #include <errno.h>
-
-#include <T.h>
 
 #ifndef SRCDIR
 #define SRCDIR_S ".."
