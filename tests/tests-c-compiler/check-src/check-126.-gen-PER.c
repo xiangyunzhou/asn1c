@@ -4,6 +4,7 @@
  * compared with *.out file, then decoded and compared with the original.
  */
 #undef	NDEBUG
+#include <PDU.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -13,8 +14,6 @@
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
-
-#include <PDU.h>
 
 #ifndef SRCDIR
 #define SRCDIR_S ".."

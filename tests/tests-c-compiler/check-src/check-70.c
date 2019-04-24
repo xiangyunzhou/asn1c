@@ -5,6 +5,7 @@
  * stream is compared with the corresponding .out file.
  */
 #undef	NDEBUG
+#include <PDU.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -14,8 +15,6 @@
 #include <ctype.h>	/* for isspace(3) */
 #include <assert.h>
 #include <errno.h>
-
-#include <PDU.h>
 
 #ifndef SRCDIR
 #define SRCDIR_S ".."
