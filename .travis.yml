@@ -23,6 +23,9 @@ matrix:
   exclude:
     - os: osx
       compiler: gcc
+  allow_failures:
+    - os: osx
+      env: TASK=distcheck
       
 before_install:
   - |
