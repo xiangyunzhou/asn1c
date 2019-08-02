@@ -64,7 +64,7 @@ ssize_t uper_get_nsnnwn(asn_per_data_t *pd);
 ssize_t aper_get_nsnnwn(asn_per_data_t *pd, int range);
 
 /* X.691-2008/11, #11.5.6 */
-int uper_get_constrained_whole_number(asn_per_data_t *pd, unsigned long *v, int nbits);
+int uper_get_constrained_whole_number(asn_per_data_t *pd, uintmax_t *v, int nbits);
 
 
 /* Temporary compatibility layer. Will get removed. */
