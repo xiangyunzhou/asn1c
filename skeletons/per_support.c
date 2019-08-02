@@ -216,7 +216,7 @@ uper_put_nslength(asn_per_outp_t *po, size_t length) {
 }
 
 static int
-per__long_range(intmax_t lb, intmax_t ub, uintmax_t *range_r) {
+per__imax_range(intmax_t lb, intmax_t ub, uintmax_t *range_r) {
     uintmax_t bounds_range;
     if((ub < 0) == (lb < 0)) {
         bounds_range = ub - lb;
@@ -232,12 +232,12 @@ per__long_range(intmax_t lb, intmax_t ub, uintmax_t *range_r) {
 }
 
 int
-per_long_range_rebase(intmax_t v, intmax_t lb, intmax_t ub, uintmax_t *output) {
+per_imax_range_rebase(intmax_t v, intmax_t lb, intmax_t ub, uintmax_t *output) {
     uintmax_t range;
 
     assert(lb <= ub);
 
-    if(v < lb || v > ub || per__long_range(lb, ub, &range) < 0) {
+    if(v < lb || v > ub || per__imax_range(lb, ub, &range) < 0) {
         /* Range error. */
         return -1;
     }
@@ -269,10 +269,10 @@ per_long_range_rebase(intmax_t v, intmax_t lb, intmax_t ub, uintmax_t *output) {
 }
 
 int
-per_long_range_unrebase(uintmax_t inp, intmax_t lb, intmax_t ub, intmax_t *outp) {
+per_imax_range_unrebase(uintmax_t inp, intmax_t lb, intmax_t ub, intmax_t *outp) {
     uintmax_t range;
 
-    if(per__long_range(lb, ub, &range) != 0) {
+    if(per__imax_range(lb, ub, &range) != 0) {
         return -1;
     }
 

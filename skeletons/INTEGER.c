@@ -657,7 +657,7 @@ INTEGER_decode_uper(const asn_codec_ctx_t *opt_codec_ctx,
 					ASN__DECODE_STARVED;
 				ASN_DEBUG("Got value %lu + low %ld",
 					uvalue, ct->lower_bound);
-                if(per_long_range_unrebase(uvalue, ct->lower_bound,
+                if(per_imax_range_unrebase(uvalue, ct->lower_bound,
                                            ct->upper_bound, &svalue)
                    || asn_long2INTEGER(st, svalue)) {
                     ASN__DECODE_FAILED;
@@ -788,7 +788,7 @@ INTEGER_encode_uper(const asn_TYPE_descriptor_t *td,
 		}
  		v = (unsigned long)value - (unsigned long)ct->lower_bound;
  	} else {
- 		if(per_long_range_rebase(value, ct->lower_bound, ct->upper_bound, &v)) {
+ 		if(per_imax_range_rebase(value, ct->lower_bound, ct->upper_bound, &v)) {
  			ASN__ENCODE_FAILED;
  		}
 	}
