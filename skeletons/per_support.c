@@ -269,6 +269,14 @@ per_imax_range_rebase(intmax_t v, intmax_t lb, intmax_t ub, uintmax_t *output) {
 }
 
 int
+per_long_range_rebase(long v, intmax_t lb, intmax_t ub, unsigned long *output) {
+    uintmax_t tmp = *output;
+    int rc = per_imax_range_rebase((intmax_t)v, lb, ub, &tmp);
+    *output = tmp;
+    return rc;
+}
+
+int
 per_imax_range_unrebase(uintmax_t inp, intmax_t lb, intmax_t ub, intmax_t *outp) {
     uintmax_t range;
 
@@ -292,6 +300,14 @@ per_imax_range_unrebase(uintmax_t inp, intmax_t lb, intmax_t ub, intmax_t *outp)
     }
 
     return 0;
+}
+
+int
+per_long_range_unrebase(unsigned long inp, intmax_t lb, intmax_t ub, long *outp) {
+    intmax_t tmp = *outp;
+    int rc = per_imax_range_unrebase((uintmax_t)inp, lb, ub, &tmp);
+    *outp = tmp;
+    return rc;
 }
 
 int32_t

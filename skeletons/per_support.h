@@ -81,8 +81,10 @@ typedef struct asn_bit_outp_s asn_per_outp_t;
  *  -1: Conversion failed due to range problems.
  *   0: Conversion was successful.
  */
+int per_long_range_rebase(long, intmax_t lb, intmax_t ub, unsigned long *output);
 int per_imax_range_rebase(intmax_t v, intmax_t lb, intmax_t ub, uintmax_t *output);
 /* The inverse operation: restores the value by the offset and its bounds. */
+int per_long_range_unrebase(unsigned long inp, intmax_t lb, intmax_t ub, long *outp);
 int per_imax_range_unrebase(uintmax_t inp, intmax_t lb, intmax_t ub, intmax_t *outp);
 
 /* X.691-2008/11, #11.5 */
