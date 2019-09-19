@@ -440,7 +440,11 @@ int aper_put_align(asn_per_outp_t *po) {
 }
 
 ssize_t
-aper_put_length(asn_per_outp_t *po, int range, size_t length) {
+aper_put_length(asn_per_outp_t *po, int range, size_t length, int *need_eom) {
+    int dummy = 0;
+    if(!need_eom) need_eom = &dummy;
+
+    *need_eom = 0;
 
 	ASN_DEBUG("APER put length %zu with range %d", length, range);
 
@@ -459,8 +463,12 @@ aper_put_length(asn_per_outp_t *po, int range, size_t length) {
 		return per_put_few_bits(po, length|0x8000, 16)
 		? -1 : (ssize_t)length;
 
+    *need_eom = 0 == (length & 16383);
 	length >>= 14;
-	if(length > 4) length = 4;
+	if(length > 4) {
+        *need_eom = 0;
+        length = 4;
+    }
 
 	return per_put_few_bits(po, 0xC0 | length, 8)
 	? -1 : (ssize_t)(length << 14);
@@ -475,7 +483,7 @@ aper_put_nslength(asn_per_outp_t *po, size_t length) {
 		if(length == 0) return -1;
 		return per_put_few_bits(po, length-1, 7) ? -1 : 0;
 	} else {
-		if(aper_put_length(po, -1, length) != (ssize_t)length) {
+		if(aper_put_length(po, -1, length, 0) != (ssize_t)length) {
 			/* This might happen in case of >16K extensions */
 			return -1;
 		}

@@ -1953,10 +1953,10 @@ OCTET_STRING_encode_aper(const asn_TYPE_descriptor_t *td,
 				st->size, sizeinunits - csiz->lower_bound,
 				csiz->effective_bits);
 		if (csiz->effective_bits > 0) {
-		        ret = aper_put_length(po, csiz->upper_bound - csiz->lower_bound + 1, sizeinunits - csiz->lower_bound);
+		        ret = aper_put_length(po, csiz->upper_bound - csiz->lower_bound + 1, sizeinunits - csiz->lower_bound, 0);
 		        if(ret) ASN__ENCODE_FAILED;
 		}
-		if ((st->size > 2) || (csiz->upper_bound > 2)) { /* X.691 #16 NOTE 1 */
+		if (csiz->effective_bits > 0 || (st->size > 2) || (csiz->upper_bound > (2 * 8 / unit_bits))) { /* X.691 #16 NOTE 1 */
 			if (aper_put_align(po) < 0)
 				ASN__ENCODE_FAILED;
 		}
@@ -1975,14 +1975,15 @@ OCTET_STRING_encode_aper(const asn_TYPE_descriptor_t *td,
 	ASN_DEBUG("Encoding %lu bytes", st->size);
 
 	if(sizeinunits == 0) {
-		if(aper_put_length(po, -1, 0))
+		if(aper_put_length(po, -1, 0, 0))
 			ASN__ENCODE_FAILED;
 		ASN__ENCODED_OK(er);
 	}
 
 	buf = st->buf;
 	while(sizeinunits) {
-		ssize_t maySave = aper_put_length(po, -1, sizeinunits);
+        int need_eom = 0;
+		ssize_t maySave = aper_put_length(po, -1, sizeinunits, &need_eom);
 
 		if(maySave < 0) ASN__ENCODE_FAILED;
 
@@ -2004,6 +2005,8 @@ OCTET_STRING_encode_aper(const asn_TYPE_descriptor_t *td,
 			buf += maySave >> 3;
 		sizeinunits -= maySave;
 		assert(!(maySave & 0x07) || !sizeinunits);
+        if(need_eom && aper_put_length(po, -1, 0, 0))
+            ASN__ENCODE_FAILED; /* End of Message length */
 	}
 
 	ASN__ENCODED_OK(er);

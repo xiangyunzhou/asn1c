@@ -101,7 +101,8 @@ int uper_put_constrained_whole_number_u(asn_per_outp_t *po, unsigned long v, int
 ssize_t uper_put_length(asn_per_outp_t *po, size_t whole_length,
                         int *opt_need_eom);
 
-ssize_t aper_put_length(asn_per_outp_t *po, int range, size_t length);
+ssize_t aper_put_length(asn_per_outp_t *po, int range, size_t length,
+                        int *opt_need_eom);
 
 /* Align the current bit position to octet bundary */
 int aper_put_align(asn_per_outp_t *po);
