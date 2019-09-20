@@ -1043,7 +1043,8 @@ INTEGER_encode_aper(const asn_TYPE_descriptor_t *td,
 		v = value - ct->lower_bound;
 
 		/* #12 <= 8 -> alignment ? */
-		if (ct->range_bits < 8) {
+		int range = ct->upper_bound - ct->lower_bound + 1;
+		if (ct->range_bits < 8 || (ct->range_bits == 8 && range < 256)) {
 			if(per_put_few_bits(po, 0x00 | v, ct->range_bits))
 				ASN__ENCODE_FAILED;
 		} else if (ct->range_bits == 8) {
@@ -1101,12 +1102,14 @@ INTEGER_encode_aper(const asn_TYPE_descriptor_t *td,
 	}
 
 	for(buf = st->buf, end = st->buf + st->size; buf < end;) {
-		ssize_t mayEncode = aper_put_length(po, -1, end - buf);
+        int need_eom = 0;
+		ssize_t mayEncode = aper_put_length(po, -1, end - buf, &need_eom);
 		if(mayEncode < 0)
 			ASN__ENCODE_FAILED;
 		if(per_put_many_bits(po, buf, 8 * mayEncode))
 			ASN__ENCODE_FAILED;
 		buf += mayEncode;
+        if(need_eom && aper_put_length(po, -1, 0, 0)) ASN__ENCODE_FAILED;
 	}
 
 	ASN__ENCODED_OK(er);
