@@ -151,7 +151,7 @@ vasprintf(char **ret, const char *fmt, va_list args) {
     if(suggested >= 0) {
         *ret = malloc(suggested + 1);
         if(*ret) {
-            int actual_length = vsnprintf(*ret, suggested + 1, fmt, copy);
+            actual_length = vsnprintf(*ret, suggested + 1, fmt, copy);
             if(actual_length >= 0) {
                 assert(actual_length == suggested);
                 assert((*ret)[actual_length] == '\0');
