@@ -1753,7 +1753,8 @@ OCTET_STRING_decode_aper(const asn_codec_ctx_t *opt_codec_ctx,
 	/* X.691, #16.7: long fixed length encoding (up to 64K octets) */
 	if(csiz->effective_bits == 0) {
 		int ret;
-		if (st->size > 2) { /* X.691 #16 NOTE 1 */
+		/* X.691 #16 NOTE 1 for fixed length (<= 16 bits) strings */
+		if (st->size > 2 || csiz->range_bits != 0) {
 			if (aper_get_align(pd) < 0)
 				RETURN(RC_FAIL);
 		}
@@ -1802,7 +1803,9 @@ OCTET_STRING_decode_aper(const asn_codec_ctx_t *opt_codec_ctx,
 			(long)csiz->effective_bits, (long)raw_len,
 			repeat ? "repeat" : "once", td->name);
 
-		if ((raw_len > 2) || (csiz->upper_bound > 2)) { /* X.691 #16 NOTE 1 */
+		/* X.691 #16 NOTE 1  for fixed length (<=16 bits) strings */
+		if ((raw_len > 2) || (csiz->upper_bound > 2) || (csiz->range_bits != 0)) 
+		{ 
 			if (aper_get_align(pd) < 0)
 				RETURN(RC_FAIL);
 		}
@@ -1956,7 +1959,11 @@ OCTET_STRING_encode_aper(const asn_TYPE_descriptor_t *td,
 		        ret = aper_put_length(po, csiz->upper_bound - csiz->lower_bound + 1, sizeinunits - csiz->lower_bound, 0);
 		        if(ret) ASN__ENCODE_FAILED;
 		}
-		if (csiz->effective_bits > 0 || (st->size > 2) || (csiz->upper_bound > (2 * 8 / unit_bits))) { /* X.691 #16 NOTE 1 */
+		if (csiz->effective_bits > 0 || (st->size > 2) 
+			|| (csiz->upper_bound > (2 * 8 / unit_bits))
+			|| (csiz->range_bits != 0)
+			) 
+		{ /* X.691 #16 NOTE 1 for fixed length (<=16 bits) strings*/
 			if (aper_put_align(po) < 0)
 				ASN__ENCODE_FAILED;
 		}
