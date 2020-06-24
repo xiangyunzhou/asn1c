@@ -282,7 +282,7 @@ NativeEnumerated_decode_aper(const asn_codec_ctx_t *opt_codec_ctx,
 		/*
 		 * X.691, #10.6: normally small non-negative whole number;
 		 */
-		//value = uper_get_nsnnwn(pd);
+		 
 		/* XXX handle indefinite index length > 64k */
  		value = aper_get_nsnnwn(pd, 65537);
 		if(value < 0) ASN__DECODE_STARVED;
