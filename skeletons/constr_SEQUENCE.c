@@ -1641,6 +1641,10 @@ SEQUENCE_decode_aper(const asn_codec_ctx_t *opt_codec_ctx,
 		ASN_DEBUG("Read in extensions bitmap for %s of %ld bits (%x..)",
 		          td->name, bmlength, *epres);
 
+		/* Deal with padding */
+ 		if (aper_get_align(pd) < 0)
+ 			ASN__DECODE_STARVED;
+ 			
 		/* Go over extensions and read them in */
 		for(edx = specs->first_extension; edx < td->elements_count; edx++) {
 			asn_TYPE_member_t *elm = &td->elements[edx];
