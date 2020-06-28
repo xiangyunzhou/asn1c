@@ -656,7 +656,7 @@ Assignment:
 	}
 
 	/*
-	 * Erroneous attemps
+	 * Erroneous attempts
 	 */
 	| BasicString {
 		return yyerror(param,
