@@ -131,7 +131,6 @@ REAL__dump(double d, int canonical, asn_app_consume_bytes_f *cb, void *app_key) 
 	char local_buf[64];
 	char *buf = local_buf;
 	ssize_t buflen = sizeof(local_buf);
-	const char *fmt = canonical ? "%.17E" /* Precise */ : "%.15f" /* Pleasant*/;
 	ssize_t ret;
 
 	/*
@@ -166,7 +165,10 @@ REAL__dump(double d, int canonical, asn_app_consume_bytes_f *cb, void *app_key) 
 	 * Use the libc's double printing, hopefully they got it right.
 	 */
 	do {
-		ret = snprintf(buf, buflen, fmt, d);
+        ret = snprintf(buf,
+                       buflen,
+                       canonical ? "%.17E" /* Precise */ : "%.15f" /* Pleasant*/,
+                       d);
 		if(ret < 0) {
 			/* There are some old broken APIs. */
 			buflen <<= 1;
