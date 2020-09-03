@@ -91,7 +91,11 @@ typedef	unsigned int	uint32_t;
 #define CC_PRINTFLIKE(fmt, var)     CC_ATTRIBUTE(format(printf, fmt, var))
 #define	CC_NOTUSED                  CC_ATTRIBUTE(unused)
 #ifndef CC_ATTR_NO_SANITIZE
+#if	__GNUC__ < 8
+#define CC_ATTR_NO_SANITIZE(what)
+#else
 #define CC_ATTR_NO_SANITIZE(what)   CC_ATTRIBUTE(no_sanitize(what))
+#endif
 #endif
 
 /* Figure out if thread safety is requested */
