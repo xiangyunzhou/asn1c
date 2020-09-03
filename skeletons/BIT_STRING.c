@@ -271,6 +271,7 @@ BIT_STRING_compare(const asn_TYPE_descriptor_t *td, const void *aptr,
     const BIT_STRING_t *b = BIT_STRING__compactify(bptr, &compact_b);
     const asn_OCTET_STRING_specifics_t *specs = td->specifics;
 
+    (void)specs;
     assert(specs && specs->subvariant == ASN_OSUBV_BIT);
 
     if(a && b) {

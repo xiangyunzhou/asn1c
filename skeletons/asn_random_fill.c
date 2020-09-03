@@ -43,6 +43,7 @@ asn_random_between(intmax_t lb, intmax_t rb) {
         uintmax_t value = 0;
         uintmax_t got_entropy = 0;
 
+        (void)intmax_max;
         assert(RAND_MAX > 0xffffff);    /* Seen 7ffffffd! */
         assert(range < intmax_max);
 

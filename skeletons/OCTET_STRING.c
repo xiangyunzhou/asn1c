@@ -2199,6 +2199,7 @@ OCTET_STRING_compare(const asn_TYPE_descriptor_t *td, const void *aptr,
     const OCTET_STRING_t *a = aptr;
     const OCTET_STRING_t *b = bptr;
 
+    (void)specs;
     assert(!specs || specs->subvariant != ASN_OSUBV_BIT);
 
     if(a && b) {
