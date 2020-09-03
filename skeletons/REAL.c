@@ -236,10 +236,11 @@ REAL__dump(double d, int canonical, asn_app_consume_bytes_f *cb, void *app_key) 
 
         assert(*s == 0x45);
         {
+            int sign;
             char *E = s;
             char *expptr = ++E;
-            char *s = expptr;
-            int sign;
+
+            s = expptr;
 
             if(*expptr == 0x2b /* '+' */) {
                 /* Skip the "+" */

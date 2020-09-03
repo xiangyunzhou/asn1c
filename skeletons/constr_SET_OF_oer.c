@@ -43,12 +43,12 @@
  * Return a standardized complex structure.
  */
 #undef  RETURN
-#define RETURN(_code)                    \
-    do {                                 \
-        asn_dec_rval_t rval;             \
-        rval.code = _code;               \
-        rval.consumed = consumed_myself; \
-        return rval;                     \
+#define RETURN(_code)                     \
+    do {                                  \
+        asn_dec_rval_t _rval;             \
+        _rval.code = _code;               \
+        _rval.consumed = consumed_myself; \
+        return _rval;                     \
     } while(0)
 
 /*
