@@ -147,7 +147,8 @@ static ssize_t
 OBJECT_IDENTIFIER__dump_body(const OBJECT_IDENTIFIER_t *st,
                              asn_app_consume_bytes_f *cb, void *app_key) {
     char scratch[32];
-    asn_oid_arc_t arc0, arc1;
+    asn_oid_arc_t arc0 = 0;
+    asn_oid_arc_t arc1 = 0;
     size_t produced = 0;
     size_t off = 0;
     ssize_t rd;
@@ -217,6 +218,7 @@ OBJECT_IDENTIFIER__xer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
 	} else if(num_arcs == 0) {
 		return XPBD_NOT_BODY_IGNORE;
 	}
+    (void)chunk_end;
 	assert(endptr == chunk_end);
 
 	if((size_t)num_arcs > sizeof(s_arcs)/sizeof(s_arcs[0])) {
@@ -293,7 +295,8 @@ OBJECT_IDENTIFIER_print(const asn_TYPE_descriptor_t *td, const void *sptr,
 ssize_t
 OBJECT_IDENTIFIER_get_arcs(const OBJECT_IDENTIFIER_t *st, asn_oid_arc_t *arcs,
                            size_t arc_slots) {
-    asn_oid_arc_t arc0, arc1;
+    asn_oid_arc_t arc0 = 0;
+    asn_oid_arc_t arc1 = 0;
     size_t num_arcs = 0;
     size_t off;
     ssize_t rd;
