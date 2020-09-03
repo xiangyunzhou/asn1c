@@ -49,7 +49,11 @@ asn_random_between(intmax_t lb, intmax_t rb) {
 
         for(; got_entropy < range;) {
             got_entropy = (got_entropy << 24) | 0xffffff;
+#ifdef HAVE_RANDOM
             value = (value << 24) | (random() % 0xffffff);
+#else
+            value = (value << 24) | (rand() % 0xffffff);
+#endif
         }
 
         return lb + (intmax_t)(value % (range + 1));
