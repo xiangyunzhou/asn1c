@@ -528,11 +528,11 @@ emit_alphabet_check_loop(arg_t *arg, asn1cnst_range_t *range) {
 }
 
 static void
-abuf_oint(abuf *ab, asn1c_integer_t v) {
+abuf_oint(abuf *ab, asn1c_integer_t v, asn1c_integer_t natural_start) {
     if(v == (-2147483647L - 1)) {
         abuf_printf(ab, "(-2147483647L - 1)");
     } else {
-        abuf_printf(ab, "%s", asn1p_itoa(v));
+        abuf_printf(ab, "%s%s", asn1p_itoa(v), natural_start ? "L" : "UL");
     }
 }
 
@@ -554,19 +554,19 @@ emit_range_comparison_code(asn1cnst_range_t *range, const char *varname,
             /* Empty constraint comparison */
         } else if(ignore_left) {
             abuf_printf(ab, "%s <= ", varname);
-            abuf_oint(ab, range->right.value);
+            abuf_oint(ab, range->right.value, natural_start);
         } else if(ignore_right) {
             abuf_printf(ab, "%s >= ", varname);
-            abuf_oint(ab, range->left.value);
+            abuf_oint(ab, range->left.value, natural_start);
         } else if(range->left.value == range->right.value) {
             abuf_printf(ab, "%s == ", varname);
-            abuf_oint(ab, range->right.value);
+            abuf_oint(ab, range->right.value, natural_start);
         } else {
             abuf_printf(ab, "%s >= ", varname);
-            abuf_oint(ab, range->left.value);
+            abuf_oint(ab, range->left.value, natural_start);
             abuf_printf(ab, " && ");
             abuf_printf(ab, "%s <= ", varname);
-            abuf_oint(ab, range->right.value);
+            abuf_oint(ab, range->right.value, natural_start);
         }
     } else {
         for(int i = 0; i < range->el_count; i++) {
