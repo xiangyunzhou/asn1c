@@ -75,7 +75,9 @@ typedef	unsigned int	uint32_t;
 #else	/* !defined(__vxworks) */
 
 #include <inttypes.h>	/* C99 specifies this file */
+#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h> /* for ntohl() */
+#endif
 #define	sys_ntohl(foo)	ntohl(foo)
 #endif	/* defined(__vxworks) */
 
