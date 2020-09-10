@@ -75,16 +75,17 @@ enum asn1c_flags {
 	 */
 	A1C_LINE_REFS       = 0x20000,
 	/*
-	 * -gen-OER
+	 * -gen-OER / -no-gen-OER
 	 * Generate Octet Encoding Rules support code
 	 */
 	A1C_GEN_OER			= 0x40000,
 	/*
-	 * -gen-PER
-	 * Generate Packed Encoding Rules support code
+	 * -gen-UPER / -no-gen-UPER
+	 * Generate Unaligned Packed Encoding Rules support code
 	 */
-	A1C_GEN_PER			= 0x80000,
+	A1C_GEN_UPER			= 0x80000,
 	/*
+	 * -gen-example / -no-gen-example
 	 * Generate converter-example.c and converter-example.mk
 	 */
 	A1C_GEN_EXAMPLE			= 0x100000,
@@ -97,6 +98,31 @@ enum asn1c_flags {
 	 * -debug-output-origin-lines
 	 */
 	A1C_DEBUG_OUTPUT_ORIGIN_LINES = 0x400000,
+	/*
+	 * -gen-BER / -no-gen-BER
+	 * Generate Basic Encoding Rules support code
+	 */
+	A1C_GEN_BER			= 0x800000,
+	/*
+	 * -gen-XER / -no-gen-XER
+	 * Generate XML Encoding Rules support code
+	 */
+	A1C_GEN_XER			= 0x1000000,
+	/*
+	 * -gen-print / -no-gen-print
+	 * Generate print code
+	 */
+	A1C_GEN_PRINT			= 0x2000000,
+	/*
+	 * -gen-random-fill / -no-gen-random-fill
+	 * Generate random fill code
+	 */
+	A1C_GEN_RFILL			= 0x4000000,
+	/*
+	 * -gen-APER / -no-gen-APER
+	 * Generate Aligned Packed Encoding Rules support code
+	 */
+	A1C_GEN_APER			= 0x8000000,
 };
 
 /*

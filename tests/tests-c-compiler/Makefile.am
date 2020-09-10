@@ -23,13 +23,13 @@ TESTS_ENVIRONMENT= \
 
 TESTS = 
 TESTS += check-src/check-03.-fwide-types.c
-TESTS += check-src/check-119.-fwide-types.-gen-PER.c
-TESTS += check-src/check-119.-gen-PER.c
-TESTS += check-src/check-126.-gen-PER.c
-TESTS += check-src/check-127.-gen-PER.c
-TESTS += check-src/check-131.-gen-PER.c
-TESTS += check-src/check-132.-gen-PER.c
-TESTS += check-src/check-133.-gen-PER.c
+TESTS += check-src/check-119.-fwide-types.-gen-UPER.c
+TESTS += check-src/check-119.-gen-UPER.c
+TESTS += check-src/check-126.-gen-UPER.c
+TESTS += check-src/check-127.-gen-UPER.c
+TESTS += check-src/check-131.-gen-UPER.c
+TESTS += check-src/check-132.-gen-UPER.c
+TESTS += check-src/check-133.-gen-UPER.c
 TESTS += check-src/check-135.-gen-OER.c
 TESTS += check-src/check-148.c
 TESTS += check-src/check-19.c
@@ -64,7 +64,7 @@ TESTS += check-src/check-158.-fcompound-names.c
 TESTS += check-src/check-159.c
 
 if TEST_64BIT
-TESTS += check-src/check64-134.-gen-PER.c
+TESTS += check-src/check64-134.-gen-UPER.c
 TESTS += check-src/check64-136.-gen-OER.c
 endif
 
@@ -76,7 +76,7 @@ EXTRA_DIST =    \
     data-70     \
     data-119    \
     data-126    \
-    check-src/check64-134.-gen-PER.c    \
+    check-src/check64-134.-gen-UPER.c    \
     check-src/check64-136.-gen-OER.c
 
 clean-local:

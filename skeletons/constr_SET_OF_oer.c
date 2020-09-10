@@ -3,8 +3,6 @@
  * All rights reserved.
  * Redistribution and modifications are permitted subject to BSD license.
  */
-#ifndef ASN_DISABLE_OER_SUPPORT
-
 #include <asn_internal.h>
 #include <constr_SET_OF.h>
 #include <asn_SET_OF.h>
@@ -281,5 +279,3 @@ SET_OF_encode_oer(const asn_TYPE_descriptor_t *td,
         ASN__ENCODED_OK(erval);
     }
 }
-
-#endif  /* ASN_DISABLE_OER_SUPPORT */

@@ -476,7 +476,7 @@ asn1c_lang_C_type_SEQUENCE_def(arg_t *arg, asn1c_ioc_table_and_objset_t *opt_ioc
 		});
 		OUT("};\n");
 
-		if((roms_count + aoms_count) && (arg->flags & (A1C_GEN_OER|A1C_GEN_PER))) {
+		if((roms_count + aoms_count) && (arg->flags & (A1C_GEN_OER | A1C_GEN_UPER | A1C_GEN_APER))) {
 			int elm = 0;
 			int comma = 0;
 			comp_mode = 0;
@@ -1158,7 +1158,7 @@ asn1c_lang_C_type_CHOICE_def(arg_t *arg) {
 	}
 
     /* Create a canonical elements map */
-    if(elements && (arg->flags & A1C_GEN_PER)) {
+    if(elements && (arg->flags & (A1C_GEN_UPER | A1C_GEN_APER))) {
         cmap = compute_canonical_members_order(arg, elements);
         if(cmap) {
             OUT("static const unsigned asn_MAP_%s_to_canonical_%d[] = {",
@@ -1488,19 +1488,27 @@ asn1c_lang_C_type_SIMPLE_TYPE(arg_t *arg) {
             }
         }
 		OUT("asn_struct_free_f %s_free;\n", p);
-		OUT("asn_struct_print_f %s_print;\n", p);
+        if(arg->flags & A1C_GEN_PRINT) {
+            OUT("asn_struct_print_f %s_print;\n", p);
+        }
 		OUT("asn_constr_check_f %s_constraint;\n", p);
-		OUT("ber_type_decoder_f %s_decode_ber;\n", p);
-		OUT("der_type_encoder_f %s_encode_der;\n", p);
-		OUT("xer_type_decoder_f %s_decode_xer;\n", p);
-		OUT("xer_type_encoder_f %s_encode_xer;\n", p);
+        if(arg->flags & A1C_GEN_BER) {
+            OUT("ber_type_decoder_f %s_decode_ber;\n", p);
+            OUT("der_type_encoder_f %s_encode_der;\n", p);
+        }
+        if(arg->flags & A1C_GEN_XER) {
+            OUT("xer_type_decoder_f %s_decode_xer;\n", p);
+            OUT("xer_type_encoder_f %s_encode_xer;\n", p);
+        }
 		if(arg->flags & A1C_GEN_OER) {
 			OUT("oer_type_decoder_f %s_decode_oer;\n", p);
 			OUT("oer_type_encoder_f %s_encode_oer;\n", p);
 		}
-		if(arg->flags & A1C_GEN_PER) {
+		if(arg->flags & A1C_GEN_UPER) {
 			OUT("per_type_decoder_f %s_decode_uper;\n", p);
 			OUT("per_type_encoder_f %s_encode_uper;\n", p);
+		}
+		if(arg->flags & A1C_GEN_APER) {
 			OUT("per_type_decoder_f %s_decode_aper;\n", p);
 			OUT("per_type_encoder_f %s_encode_aper;\n", p);
 		}
@@ -2162,6 +2170,7 @@ emit_member_OER_constraints(arg_t *arg, asn1p_expr_t *expr, const char *pfx) {
 
     REDIR(OT_CTDEFS);
 
+    OUT("#if !defined(ASN_DISABLE_OER_SUPPORT)\n");
     OUT("static asn_oer_constraints_t "
         "asn_OER_%s_%s_constr_%d CC_NOTUSED = {\n",
         pfx, MKID(expr), expr->_type_unique_index);
@@ -2193,6 +2202,7 @@ emit_member_OER_constraints(arg_t *arg, asn1p_expr_t *expr, const char *pfx) {
     INDENT(-1);
 
     OUT("};\n");
+    OUT("#endif  /* !defined(ASN_DISABLE_OER_SUPPORT) */\n");
 
     REDIR(save_target);
 
@@ -2207,7 +2217,7 @@ emit_member_PER_constraints(arg_t *arg, asn1p_expr_t *expr, const char *pfx) {
 
 	etype = expr_get_type(arg, expr);
 
-	if((arg->flags & A1C_GEN_PER)
+	if((arg->flags & (A1C_GEN_UPER | A1C_GEN_APER))
 	&& (expr->combined_constraints
 		|| etype == ASN_BASIC_ENUMERATED
 		|| etype == ASN_CONSTR_CHOICE
@@ -2229,6 +2239,7 @@ emit_member_PER_constraints(arg_t *arg, asn1p_expr_t *expr, const char *pfx) {
 
 	REDIR(OT_CTDEFS);
 
+    OUT_NOINDENT("#if !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT)\n");
 	if(!(expr->_type_referenced)) OUT("static ");
 	OUT("asn_per_constraints_t "
 		"asn_PER_%s_%s_constr_%d CC_NOTUSED = {\n",
@@ -2355,6 +2366,7 @@ emit_member_PER_constraints(arg_t *arg, asn1p_expr_t *expr, const char *pfx) {
 	INDENT(-1);
 
 	OUT("};\n");
+    OUT_NOINDENT("#endif  /* !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT) */\n");
 
 	REDIR(save_target);
 
@@ -2932,7 +2944,9 @@ emit_member_table(arg_t *arg, asn1p_expr_t *expr, asn1c_ioc_table_and_objset_t *
     }
 	OUT(",\n");
 
-    OUT("{ ");
+    OUT("{\n");
+    INDENT(+1);
+    OUT_NOINDENT("#if !defined(ASN_DISABLE_OER_SUPPORT)\n");
 	if(C99_MODE) OUT(".oer_constraints = ");
 	if(arg->flags & A1C_GEN_OER) {
 		if(expr->constraints) {
@@ -2945,9 +2959,11 @@ emit_member_table(arg_t *arg, asn1p_expr_t *expr, asn1c_ioc_table_and_objset_t *
 	} else {
         OUT("0");
 	}
-    OUT(", ");
+    OUT(",\n");
+    OUT_NOINDENT("#endif  /* !defined(ASN_DISABLE_OER_SUPPORT) */\n");
+    OUT_NOINDENT("#if !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT)\n");
 	if(C99_MODE) OUT(".per_constraints = ");
-	if(arg->flags & A1C_GEN_PER) {
+	if(arg->flags & (A1C_GEN_UPER | A1C_GEN_APER)) {
 		if(expr->constraints) {
 			OUT("&asn_PER_memb_%s_constr_%d",
 				MKID(expr),
@@ -2958,23 +2974,25 @@ emit_member_table(arg_t *arg, asn1p_expr_t *expr, asn1c_ioc_table_and_objset_t *
 	} else {
 		OUT("0");
 	}
-    OUT(", ");
+    OUT(",\n");
+    OUT_NOINDENT("#endif  /* !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT) */\n");
 	if(C99_MODE) OUT(".general_constraints = ");
 	if(expr->constraints) {
 		if(arg->flags & A1C_NO_CONSTRAINTS) {
-			OUT("0");
+			OUT("0\n");
 		} else {
 			const char *id = MKID(expr);
 			if(expr->_anonymous_type
 					&& !strcmp(expr->Identifier, "Member"))
 				id = asn1c_type_name(arg, expr, TNF_SAFE);
-			OUT(" memb_%s_constraint_%d", id,
+			OUT("memb_%s_constraint_%d\n", id,
 				arg->expr->_type_unique_index);
 		}
 	} else {
-		OUT("0");
+		OUT("0\n");
 	}
-    OUT(" },\n");
+    INDENT(-1);
+    OUT("},\n");
 
 	if(try_inline_default(arg, expr, 0)) {
 	} else {
@@ -3114,7 +3132,9 @@ emit_type_DEF(arg_t *arg, asn1p_expr_t *expr, enum tvm_compat tv_mode, int tags_
 			OUT("0,\t/* No tags (count) */\n");
 		}
 
-		OUT("{ ");
+		OUT("{\n");
+        INDENT(+1);
+        OUT_NOINDENT("#if !defined(ASN_DISABLE_OER_SUPPORT)\n");
 		if(arg->flags & A1C_GEN_OER) {
 			if(expr->combined_constraints
 			|| expr->expr_type == ASN_BASIC_ENUMERATED
@@ -3127,9 +3147,10 @@ emit_type_DEF(arg_t *arg, asn1p_expr_t *expr, enum tvm_compat tv_mode, int tags_
 		} else {
 			OUT("0");
 		}
-        OUT(", ");
-
-		if(arg->flags & A1C_GEN_PER) {
+        OUT(",\n");
+        OUT_NOINDENT("#endif  /* !defined(ASN_DISABLE_OER_SUPPORT) */\n");
+        OUT_NOINDENT("#if !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT)\n");
+		if(arg->flags & (A1C_GEN_UPER | A1C_GEN_APER)) {
             if(expr->combined_constraints
                || expr->expr_type == ASN_BASIC_ENUMERATED
                || expr->expr_type == ASN_CONSTR_CHOICE
@@ -3142,7 +3163,8 @@ emit_type_DEF(arg_t *arg, asn1p_expr_t *expr, enum tvm_compat tv_mode, int tags_
 		} else {
 			OUT("0");
 		}
-		OUT(", ");
+        OUT(",\n");
+        OUT_NOINDENT("#endif  /* !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT) */\n");
 #define FUNCREF(foo)                              \
     do {                                          \
         OUT("%s", p);                             \
@@ -3165,7 +3187,9 @@ emit_type_DEF(arg_t *arg, asn1p_expr_t *expr, enum tvm_compat tv_mode, int tags_
 			else
 				FUNCREF(constraint);
 		}
-        OUT(" },\n");
+        OUT("\n");
+        INDENT(-1);
+        OUT("},\n");
 
         free(p);
         p = NULL;

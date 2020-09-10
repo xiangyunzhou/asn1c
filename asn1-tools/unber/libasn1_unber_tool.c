@@ -27,8 +27,10 @@
 #include "asn1_common.h"
 #include "libasn1_unber_tool.h"
 
-#define ASN_DISABLE_PER_SUPPORT 1
+#define ASN_DISABLE_UPER_SUPPORT 1
+#define ASN_DISABLE_APER_SUPPORT 1
 #define ASN_DISABLE_OER_SUPPORT 1
+#define ASN_DISABLE_PRINT_SUPPORT 1
 
 #include <asn1parser.h> /* For static string tables */
 
@@ -37,9 +39,18 @@
 #include <ber_tlv_tag.c>
 #include <ber_tlv_length.c>
 #include <INTEGER.c>
+#include <INTEGER_ber.c>
+#include <INTEGER_xer.c>
+#include <INTEGER_rfill.c>
 #include <OBJECT_IDENTIFIER.c>
+#include <OBJECT_IDENTIFIER_xer.c>
+#include <OBJECT_IDENTIFIER_rfill.c>
 #include <RELATIVE-OID.c>
+#include <RELATIVE-OID_xer.c>
+#include <RELATIVE-OID_rfill.c>
 #include <asn_codecs_prim.c>
+#include <asn_codecs_prim_ber.c>
+#include <asn_codecs_prim_xer.c>
 #include <asn1p_integer.c>
 #include <asn_internal.c>
 
@@ -831,4 +842,3 @@ asn_random_between(intmax_t a, intmax_t b) {
     (void)b;
     return a;
 };
-

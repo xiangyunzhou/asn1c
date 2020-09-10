@@ -1,23 +1,23 @@
 @CODE_COVERAGE_RULES@
 
-check_PROGRAMS =            \
-    check-ber_tlv_tag       \
-    check-length            \
-    check-bits              \
-    check-OIDs              \
-    check-GeneralizedTime   \
-    check-OCTET_STRING      \
-    check-UTF8String        \
-    check-UTCTime           \
-    check-INTEGER           \
-    check-REAL              \
-    check-XER               \
-    check-OER-support       \
-    check-OER-INTEGER       \
-    check-OER-NativeEnumerated \
-    check-PER-support       \
-    check-PER-UniversalString  \
-    check-PER-INTEGER
+check_PROGRAMS =                \
+    check-ber_tlv_tag           \
+    check-length                \
+    check-bits                  \
+    check-OIDs                  \
+    check-GeneralizedTime       \
+    check-OCTET_STRING          \
+    check-UTF8String            \
+    check-UTCTime               \
+    check-INTEGER               \
+    check-REAL                  \
+    check-XER                   \
+    check-OER-support           \
+    check-OER-INTEGER           \
+    check-OER-NativeEnumerated  \
+    check-UPER-support          \
+    check-UPER-UniversalString  \
+    check-UPER-INTEGER
 
 if EXPLICIT_M32
 check_PROGRAMS +=                   \
@@ -35,9 +35,9 @@ check_PROGRAMS +=                   \
     check-32-OER-support            \
     check-32-OER-INTEGER            \
     check-32-OER-NativeEnumerated   \
-    check-32-PER-support            \
-    check-32-PER-UniversalString    \
-    check-32-PER-INTEGER
+    check-32-UPER-support           \
+    check-32-UPER-UniversalString   \
+    check-32-UPER-INTEGER
 
 check_32_ber_tlv_tag_CFLAGS=$(CFLAGS_M32)
 check_32_ber_tlv_tag_LDADD=$(LDADD_32)
@@ -81,15 +81,15 @@ check_32_OER_INTEGER_SOURCES=check-OER-INTEGER.c
 check_32_OER_NativeEnumerated_CFLAGS=$(CFLAGS_M32)
 check_32_OER_NativeEnumerated_LDADD=$(LDADD_32)
 check_32_OER_NativeEnumerated_SOURCES=check-OER-NativeEnumerated.c
-check_32_PER_support_CFLAGS=$(CFLAGS_M32)
-check_32_PER_support_LDADD=$(LDADD_32)
-check_32_PER_support_SOURCES=check-PER-support.c
-check_32_PER_UniversalString_CFLAGS=$(CFLAGS_M32)
-check_32_PER_UniversalString_LDADD=$(LDADD_32)
-check_32_PER_UniversalString_SOURCES=check-PER-UniversalString.c
-check_32_PER_INTEGER_CFLAGS=$(CFLAGS_M32)
-check_32_PER_INTEGER_LDADD=$(LDADD_32)
-check_32_PER_INTEGER_SOURCES=check-PER-INTEGER.c
+check_32_UPER_support_CFLAGS=$(CFLAGS_M32)
+check_32_UPER_support_LDADD=$(LDADD_32)
+check_32_UPER_support_SOURCES=check-UPER-support.c
+check_32_UPER_UniversalString_CFLAGS=$(CFLAGS_M32)
+check_32_UPER_UniversalString_LDADD=$(LDADD_32)
+check_32_UPER_UniversalString_SOURCES=check-UPER-UniversalString.c
+check_32_UPER_INTEGER_CFLAGS=$(CFLAGS_M32)
+check_32_UPER_INTEGER_LDADD=$(LDADD_32)
+check_32_UPER_INTEGER_SOURCES=check-UPER-INTEGER.c
 
 LDADD_32 = -lm $(top_builddir)/skeletons/libasn1cskeletons_c89_32.la
 endif

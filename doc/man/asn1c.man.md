@@ -114,11 +114,29 @@ and other encoding rules.
 
 ## Codecs Generation Options
 
--gen-OER
-:   Generate the Octet Encoding Rules (OER) support code.
+-no-gen-BER
+:   Do not generate the Basic Encoding Rules (BER, X.690) support code
 
--gen-PER
-:   Generate the Packed Encoding Rules (PER) support code.
+-no-gen-XER
+:   Do not generate the XML Encoding Rules (XER, X.693) support code
+
+-no-gen-OER
+:   Do not generate the Octet Encoding Rules (OER, X.696) support code
+
+-no-gen-UPER
+:   Do not generate the Unaligned Packed Encoding Rules (PER, X.691) support code
+
+-no-gen-APER
+:   Do not generate the Aligned Packed Encoding Rules (PER, X.691) support code
+
+-no-gen-print
+:   Do not generate the print code
+
+-no-gen-random-fill
+:   Do not generate the random fill code
+
+-no-gen-example
+:   Do not generate the ASN.1 format converter example
 
 -pdu={all|auto|*Type*}
 :   Create a PDU table for specified types, or discover Protocol Data Units

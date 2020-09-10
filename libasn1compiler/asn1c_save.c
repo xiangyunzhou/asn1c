@@ -57,6 +57,40 @@ static int asn1c__pdu_type_lookup(const char *typename);
 static int generate_constant_file(arg_t *arg, const char *destdir);
 
 static int
+asn1c__save_asn_config(arg_t *arg, const char *destdir,
+                       const char *cfgfile_name) {
+    FILE *mkf;
+
+    mkf = asn1c_open_file(destdir, cfgfile_name, "", 0);
+    if(mkf == NULL) {
+        perror(cfgfile_name);
+        return -1;
+    }
+
+    safe_fprintf(mkf, "// Generated automatically. Don't edit manually!\n\n");
+
+    if(!(arg->flags & A1C_GEN_BER))
+        safe_fprintf(mkf, "#define ASN_DISABLE_BER_SUPPORT 1\n");
+    if(!(arg->flags & A1C_GEN_XER))
+        safe_fprintf(mkf, "#define ASN_DISABLE_XER_SUPPORT 1\n");
+    if(!(arg->flags & A1C_GEN_OER))
+        safe_fprintf(mkf, "#define ASN_DISABLE_OER_SUPPORT 1\n");
+    if(!(arg->flags & A1C_GEN_UPER))
+        safe_fprintf(mkf, "#define ASN_DISABLE_UPER_SUPPORT 1\n");
+    if(!(arg->flags & A1C_GEN_APER))
+        safe_fprintf(mkf, "#define ASN_DISABLE_APER_SUPPORT 1\n");
+    if(!(arg->flags & A1C_GEN_PRINT))
+        safe_fprintf(mkf, "#define ASN_DISABLE_PRINT_SUPPORT 1\n");
+    if(!(arg->flags & A1C_GEN_RFILL))
+        safe_fprintf(mkf, "#define ASN_DISABLE_RFILL_SUPPORT 1\n");
+
+    fclose(mkf);
+    safe_fprintf(stderr, "Generated %s%s\n", destdir, cfgfile_name);
+
+    return 0;
+}
+
+static int
 asn1c__save_library_makefile(arg_t *arg, const asn1c_dep_chainset *deps,
                              const char *datadir, const char *destdir,
                              const char *makefile_name) {
@@ -148,9 +182,14 @@ asn1c__save_library_makefile(arg_t *arg, const asn1c_dep_chainset *deps,
 	safe_fprintf(
 		mkf,
 		"\n"
-		"ASN_MODULE_CFLAGS=%s%s",
+		"ASN_MODULE_CFLAGS=%s%s%s%s%s%s%s",
+		(arg->flags & A1C_GEN_BER) ? "" : "-DASN_DISABLE_BER_SUPPORT ",
+		(arg->flags & A1C_GEN_XER) ? "" : "-DASN_DISABLE_XER_SUPPORT ",
 		(arg->flags & A1C_GEN_OER) ? "" : "-DASN_DISABLE_OER_SUPPORT ",
-		(arg->flags & A1C_GEN_PER) ? "" : "-DASN_DISABLE_PER_SUPPORT ");
+		(arg->flags & A1C_GEN_UPER) ? "" : "-DASN_DISABLE_UPER_SUPPORT ",
+		(arg->flags & A1C_GEN_APER) ? "" : "-DASN_DISABLE_APER_SUPPORT ",
+		(arg->flags & A1C_GEN_PRINT) ? "" : "-DASN_DISABLE_PRINT_SUPPORT ",
+		(arg->flags & A1C_GEN_RFILL) ? "" : "-DASN_DISABLE_RFILL_SUPPORT ");
 
 	safe_fprintf(
 		mkf,
@@ -186,12 +225,19 @@ asn1c__save_example_mk_makefile(arg_t *arg, const asn1c_dep_chainset *deps,
         mkf,
         "include %s%s\n\n"
         "LIBS += -lm\n"
-        "CFLAGS += $(ASN_MODULE_CFLAGS) %s%s-I.\n"
+        "CFLAGS += $(ASN_MODULE_CFLAGS) %s%s%s%s%s%s%s%s%s-I.\n"
         "ASN_LIBRARY ?= libasncodec.a\n"
         "ASN_PROGRAM ?= converter-example\n"
         "ASN_PROGRAM_SRCS ?= ",
         destdir, library_makefile_name,
         (arg->flags & A1C_PDU_TYPE) ? generate_pdu_C_definition() : "",
+        (arg->flags & A1C_GEN_BER) ? "": "-DASN_DISABLE_BER_SUPPORT ",
+        (arg->flags & A1C_GEN_XER) ? "": "-DASN_DISABLE_XER_SUPPORT ",
+        (arg->flags & A1C_GEN_OER) ? "": "-DASN_DISABLE_OER_SUPPORT ",
+        (arg->flags & A1C_GEN_UPER) ? "": "-DASN_DISABLE_UPER_SUPPORT ",
+        (arg->flags & A1C_GEN_APER) ? "": "-DASN_DISABLE_APER_SUPPORT ",
+        (arg->flags & A1C_GEN_PRINT) ? "": "-DASN_DISABLE_PRINT_SUPPORT ",
+        (arg->flags & A1C_GEN_RFILL) ? "": "-DASN_DISABLE_RFILL_SUPPORT ",
         need_to_generate_pdu_collection(arg) ? "-DASN_PDU_COLLECTION " : "");
 
     if(dlist) {
@@ -262,12 +308,19 @@ asn1c__save_example_am_makefile(arg_t *arg, const asn1c_dep_chainset *deps, cons
 	safe_fprintf(mkf,
 	             "include %s%s\n\n"
 	             "bin_PROGRAMS += asn1convert\n"
-	             "asn1convert_CFLAGS = $(ASN_MODULE_CFLAGS) %s%s\n"
+	             "asn1convert_CFLAGS = $(ASN_MODULE_CFLAGS) %s%s%s%s%s%s%s%s%s\n"
 	             "asn1convert_CPPFLAGS = -I$(top_srcdir)/%s\n"
 	             "asn1convert_LDADD = libasncodec.la\n"
 	             "asn1convert_SOURCES = ",
 	             destdir, library_makefile_name,
 	             (arg->flags & A1C_PDU_TYPE) ? generate_pdu_C_definition() : "",
+                 (arg->flags & A1C_GEN_BER) ? "": "-DASN_DISABLE_BER_SUPPORT ",
+                 (arg->flags & A1C_GEN_XER) ? "": "-DASN_DISABLE_XER_SUPPORT ",
+                 (arg->flags & A1C_GEN_OER) ? "": "-DASN_DISABLE_OER_SUPPORT ",
+                 (arg->flags & A1C_GEN_UPER) ? "": "-DASN_DISABLE_UPER_SUPPORT ",
+                 (arg->flags & A1C_GEN_APER) ? "": "-DASN_DISABLE_APER_SUPPORT ",
+                 (arg->flags & A1C_GEN_PRINT) ? "": "-DASN_DISABLE_PRINT_SUPPORT ",
+                 (arg->flags & A1C_GEN_RFILL) ? "": "-DASN_DISABLE_RFILL_SUPPORT ",
 	             need_to_generate_pdu_collection(arg) ? "-DASN_PDU_COLLECTION " : "", destdir);
 
 	if(dlist) {
@@ -375,6 +428,7 @@ asn1c_save_compiled_output(arg_t *arg, const char *datadir, const char *destdir,
     const char* example_am_makefile = "Makefile.am.asn1convert";
     const char* program_makefile = "converter-example.mk";
     const char* library_makefile = "Makefile.am.libasncodec";
+    const char* cfgfile_name = "asn_config.h";
 
     /*
      * Early check that we can properly generate PDU collection.
@@ -415,6 +469,9 @@ asn1c_save_compiled_output(arg_t *arg, const char *datadir, const char *destdir,
             break;
         }
 
+        if(ret) break;
+
+        ret = asn1c__save_asn_config(arg, destdir, cfgfile_name);
         if(ret) break;
 
         ret = asn1c__save_library_makefile(arg, deps, datadir, destdir,

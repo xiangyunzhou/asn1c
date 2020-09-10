@@ -56,7 +56,7 @@ main(int ac, char **av) {
     enum asn1p_flags asn1_parser_flags = A1P_NOFLAGS;
     enum asn1f_flags asn1_fixer_flags = A1F_NOFLAGS;
     enum asn1c_flags asn1_compiler_flags =
-        A1C_NO_C99 | A1C_GEN_OER | A1C_GEN_PER | A1C_GEN_EXAMPLE;
+        A1C_NO_C99 | A1C_GEN_BER | A1C_GEN_XER | A1C_GEN_OER | A1C_GEN_UPER | A1C_GEN_APER | A1C_GEN_PRINT | A1C_GEN_RFILL | A1C_GEN_EXAMPLE;
     enum asn1print_flags asn1_printer_flags = APF_NOFLAGS;
     int print_arg__print_out = 0;   /* Don't compile, just print parsed */
     int print_arg__fix_n_print = 0; /* Fix and print */
@@ -150,10 +150,20 @@ main(int ac, char **av) {
             }
             break;
         case 'g':
-            if(strcmp(optarg, "en-PER") == 0) {
-                asn1_compiler_flags |= A1C_GEN_PER;
+            if(strcmp(optarg, "en-BER") == 0) {
+                asn1_compiler_flags |= A1C_GEN_BER;
+            } else if(strcmp(optarg, "en-XER") == 0) {
+                asn1_compiler_flags |= A1C_GEN_XER;
             } else if(strcmp(optarg, "en-OER") == 0) {
                 asn1_compiler_flags |= A1C_GEN_OER;
+            } else if(strcmp(optarg, "en-UPER") == 0) {
+                asn1_compiler_flags |= A1C_GEN_UPER;
+            } else if(strcmp(optarg, "en-APER") == 0) {
+                asn1_compiler_flags |= A1C_GEN_APER;
+            } else if(strcmp(optarg, "en-print") == 0) {
+                asn1_compiler_flags |= A1C_GEN_PRINT;
+            } else if(strcmp(optarg, "en-random-fill") == 0) {
+                asn1_compiler_flags |= A1C_GEN_RFILL;
             } else if(strcmp(optarg, "en-example") == 0) {
                 asn1_compiler_flags |= A1C_GEN_EXAMPLE;
             } else if(strcmp(optarg, "en-autotools") == 0) {
@@ -166,10 +176,20 @@ main(int ac, char **av) {
         case 'h':
             usage(av[0]);
         case 'n':
-            if(strcmp(optarg, "o-gen-PER") == 0) {
-                asn1_compiler_flags &= ~A1C_GEN_PER;
+            if(strcmp(optarg, "o-gen-BER") == 0) {
+                asn1_compiler_flags &= ~A1C_GEN_BER;
+            } else if(strcmp(optarg, "o-gen-XER") == 0) {
+                asn1_compiler_flags &= ~A1C_GEN_XER;
             } else if(strcmp(optarg, "o-gen-OER") == 0) {
                 asn1_compiler_flags &= ~A1C_GEN_OER;
+            } else if(strcmp(optarg, "o-gen-UPER") == 0) {
+                asn1_compiler_flags &= ~A1C_GEN_UPER;
+            } else if(strcmp(optarg, "o-gen-APER") == 0) {
+                asn1_compiler_flags &= ~A1C_GEN_APER;
+            } else if(strcmp(optarg, "o-gen-print") == 0) {
+                asn1_compiler_flags &= ~A1C_GEN_PRINT;
+            } else if(strcmp(optarg, "o-gen-random-fill") == 0) {
+                asn1_compiler_flags &= ~A1C_GEN_RFILL;
             } else if(strcmp(optarg, "o-gen-example") == 0) {
                 asn1_compiler_flags &= ~A1C_GEN_EXAMPLE;
             } else if(strcmp(optarg, "o-gen-autotools") == 0) {
@@ -566,8 +586,13 @@ usage(const char *av0) {
 "  -fwide-types          Use INTEGER_t instead of \"long\" by default, etc.\n"
 "\n"
 
-"  -no-gen-OER           Do not generate the OER (X.696) support code\n"
-"  -no-gen-PER           Do not generate the PER (X.691) support code\n"
+"  -no-gen-BER           Do not generate the Basic Encoding Rules (BER, X.690) support code\n"
+"  -no-gen-XER           Do not generate the XML Encoding Rules (XER, X.693) support code\n"
+"  -no-gen-OER           Do not generate the Octet Encoding Rules (OER, X.696) support code\n"
+"  -no-gen-UPER          Do not generate the Unaligned Packed Encoding Rules (PER, X.691) support code\n"
+"  -no-gen-APER          Do not generate the Aligned Packed Encoding Rules (PER, X.691) support code\n"
+"  -no-gen-print         Do not generate the print code\n"
+"  -no-gen-random-fill   Do not generate the random fill code\n"
 "  -no-gen-example       Do not generate the ASN.1 format converter example\n"
 "  -gen-autotools        Generate example top-level configure.ac and Makefile.am\n"
 "  -pdu={all|auto|Type}  Generate PDU table (discover PDUs automatically)\n"

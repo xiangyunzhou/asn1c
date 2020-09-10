@@ -27,8 +27,13 @@ typedef struct {
         FDEP_REFERRED = (1 << 2),     /* Dynamic list of dependencies */
         FDEP_CONVERTER = (1 << 3),    /* Name of the file with int main() */
         FDEP_COMMON_FILES = (1 << 4), /* Section for mandatory dependencies */
-        FDEP_CODEC_OER = (1 << 5),    /* Use contents only if -gen-OER */
-        FDEP_CODEC_PER = (1 << 6),    /* Use contents only if -gen-PER */
+        FDEP_CODEC_OER = (1 << 5),    /* Use contents only if not -no-gen-OER */
+        FDEP_CODEC_UPER = (1 << 6),   /* Use contents only if not -no-gen-UPER */
+        FDEP_CODEC_APER = (1 << 7),   /* Use contents only if not -no-gen-APER */
+        FDEP_CODEC_BER = (1 << 8),    /* Use contents only if not -no-gen-BER */
+        FDEP_CODEC_XER = (1 << 9),    /* Use contents only if not -no-gen-XER */
+        FDEP_PRINT = (1 << 10),       /* Use contents only if not -no-gen-print */
+        FDEP_RFILL = (1 << 11),       /* Use contents only if not -no-gen-random-fill */
     } section;                        /* Some file refers to it */
 
     /* Whether this chain is alive and has to be present in the output */

@@ -228,12 +228,12 @@ main(int ac, char *av[]) {
     }
 
     /* Figure out if a specialty decoder needs to be default */
-#ifndef ASN_DISABLE_OER_SUPPORT
+#if !defined(ASN_DISABLE_OER_SUPPORT)
     isyntax = ATS_BASIC_OER;
-#endif
-#ifndef ASN_DISABLE_PER_SUPPORT
+#endif  /* !defined(ASN_DISABLE_OER_SUPPORT) */
+#if !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT)
     isyntax = ATS_UNALIGNED_BASIC_PER;
-#endif
+#endif  /* !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT) */
 
     /*
      * Process the command-line arguments.
@@ -850,20 +850,31 @@ data_decode_from_file(enum asn_transfer_syntax isyntax, asn_TYPE_descriptor_t *p
 #endif
 
         if(is_syntax_PER(isyntax) && opt_nopad) {
-#ifdef  ASN_DISABLE_PER_SUPPORT
-            rval.code = RC_FAIL;
-            rval.consumed = 0;
-#else
-            if(isyntax == ATS_UNALIGNED_BASIC_PER)
+            switch(isyntax) {
+#if !defined(ASN_DISABLE_UPER_SUPPORT)
+            case ATS_UNALIGNED_BASIC_PER:
+            case ATS_UNALIGNED_CANONICAL_PER:
                 rval = uper_decode(opt_codec_ctx, pduType, (void **)&structure,
                                    i_bptr, i_size, 0, DynamicBuffer.unbits);
-            else
+                /* uper_decode() returns bits! */
+                ecbits = rval.consumed % 8; /* Bits consumed from the last byte */
+                rval.consumed >>= 3;    /* Convert bits into bytes. */
+                break;
+#endif  /* !defined(ASN_DISABLE_UPER_SUPPORT) */
+#if !defined(ASN_DISABLE_APER_SUPPORT)
+            case ATS_ALIGNED_BASIC_PER:
+            case ATS_ALIGNED_CANONICAL_PER:
                 rval = aper_decode(opt_codec_ctx, pduType, (void **)&structure,
                                    i_bptr, i_size, 0, DynamicBuffer.unbits);
-            /* uper_decode() returns bits! */
-            ecbits = rval.consumed % 8; /* Bits consumed from the last byte */
-            rval.consumed >>= 3;    /* Convert bits into bytes. */
-#endif
+                /* aper_decode() returns bits! */
+                ecbits = rval.consumed % 8; /* Bits consumed from the last byte */
+                rval.consumed >>= 3;    /* Convert bits into bytes. */
+                break;
+#endif  /* !defined(ASN_DISABLE_APER_SUPPORT) */
+            default:
+                rval.code = RC_FAIL;
+                rval.consumed = 0;
+            }
             /* Non-padded PER decoder */
         } else {
             rval = asn_decode(opt_codec_ctx, isyntax, pduType,

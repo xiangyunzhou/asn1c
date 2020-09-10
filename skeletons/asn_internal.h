@@ -21,6 +21,15 @@
 extern "C" {
 #endif
 
+#if !defined(ASN_DISABLE_UPER_SUPPORT)
+#include <uper_decoder.h>
+#include <uper_encoder.h>
+#endif  /* !defined(ASN_DISABLE_UPER_SUPPORT) */
+#if !defined(ASN_DISABLE_APER_SUPPORT)
+#include <aper_decoder.h>
+#include <aper_encoder.h>
+#endif  /* !defined(ASN_DISABLE_APER_SUPPORT) */
+
 /* Environment version might be used to avoid running with the old library */
 #define	ASN1C_ENVIRONMENT_VERSION	923	/* Compile-time version */
 int get_asn1c_environment_version(void);	/* Run-time version */

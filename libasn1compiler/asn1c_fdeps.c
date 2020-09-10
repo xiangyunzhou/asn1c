@@ -116,14 +116,34 @@ asn1c_read_file_dependencies(arg_t *arg, const char *datadir) {
 				} else if(strcmp(p, "CONVERTER:") == 0) {
                     activate = 1;
 					section = FDEP_CONVERTER;
+				} else if((arg->flags & A1C_GEN_BER)
+					  && strcmp(p, "CODEC-BER:") == 0) {
+                    activate = 0;
+					section = FDEP_CODEC_BER;
+				} else if((arg->flags & A1C_GEN_XER)
+					  && strcmp(p, "CODEC-XER:") == 0) {
+                    activate = 0;
+					section = FDEP_CODEC_XER;
 				} else if((arg->flags & A1C_GEN_OER)
 					  && strcmp(p, "CODEC-OER:") == 0) {
                     activate = 0;
 					section = FDEP_CODEC_OER;
-				} else if((arg->flags & A1C_GEN_PER)
-					  && strcmp(p, "CODEC-PER:") == 0) {
+				} else if((arg->flags & A1C_GEN_UPER)
+					  && strcmp(p, "CODEC-UPER:") == 0) {
                     activate = 0;
-					section = FDEP_CODEC_PER;
+					section = FDEP_CODEC_UPER;
+				} else if((arg->flags & A1C_GEN_APER)
+					  && strcmp(p, "CODEC-APER:") == 0) {
+                    activate = 0;
+					section = FDEP_CODEC_APER;
+				} else if((arg->flags & A1C_GEN_PRINT)
+					  && strcmp(p, "PRINT:") == 0) {
+                    activate = 0;
+					section = FDEP_PRINT;
+				} else if((arg->flags & A1C_GEN_RFILL)
+					  && strcmp(p, "RFILL:") == 0) {
+                    activate = 0;
+					section = FDEP_RFILL;
 				} else {
 					section = FDEP_IGNORE;
                     activate = 0;
