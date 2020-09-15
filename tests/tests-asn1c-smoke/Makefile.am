@@ -1,3 +1,7 @@
+TESTS_ENVIRONMENT= MAKE=${MAKE}                     \
+                    top_builddir=${top_builddir}    \
+                    top_srcdir=${top_srcdir}
+
 TESTS =
 TESTS += check-INTEGER.sh
 TESTS += check-INTEGER(0..1).sh
@@ -19,7 +23,7 @@ TESTS += check-SEQUENCE_OF_INTEGER.sh
 
 CLEANFILES = Makefile.am.* *.[acho] check-*.log check-*.trs
 
-EXTRA_DIST = README check-*.sh
+EXTRA_DIST = README $(srcdir)/check-*.sh
 
 clean-local:
 	rm -rf test-*

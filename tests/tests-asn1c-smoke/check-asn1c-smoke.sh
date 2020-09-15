@@ -4,9 +4,8 @@ set -x
 set -e
 set -o pipefail
 
-basedir=$(dirname "$0")
-top_builddir=${top_builddir:-${basedir}/../..}
-top_srcdir=${top_srcdir:-${basedir}/../..}
+top_builddir=${top_builddir:-../..}
+top_srcdir=${top_srcdir:-../..}
 
 cleanup() {
     rm -rf *.[acho] Makefile.am.* *.mk *.txt *.asn
@@ -31,7 +30,10 @@ verify() {
 
     cleanup
 
-    asncmd="${top_builddir}/asn1c/asn1c -Wdebug-compiler -flink-skeletons -S ${top_srcdir}/skeletons $flags test.asn"
+    rm -rf "test-${type}"
+    mkdir "test-${type}"
+    cd "test-${type}"
+    asncmd="../${top_builddir}/asn1c/asn1c -Wdebug-compiler -flink-skeletons -S ../${top_srcdir}/skeletons $flags test.asn"
 
     {
     echo "$asncmd"
@@ -41,6 +43,7 @@ verify() {
     echo "Module DEFINITIONS::=BEGIN T::=$type END" > test.asn
     $asncmd
     CFLAGS=-O0 ${MAKE:-make} -f converter-example.mk | tail -10
+    cd ..
 }
 
 verify_type_with_variants() {
