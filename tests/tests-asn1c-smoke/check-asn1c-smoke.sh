@@ -4,8 +4,9 @@ set -x
 set -e
 set -o pipefail
 
-top_builddir=${top_builddir:-../..}
-top_srcdir=${top_srcdir:-../..}
+basedir=$(dirname "$0")
+top_builddir=${top_builddir:-${basedir}/../..}
+top_srcdir=${top_srcdir:-${basedir}/../..}
 
 cleanup() {
     rm -rf *.[acho] Makefile.am.* *.mk *.txt *.asn
