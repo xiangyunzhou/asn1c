@@ -2,7 +2,7 @@ AC_INIT([asn1c],[0.9.29],[vlm@lionet.info])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign tar-pax])
 AC_CONFIG_MACRO_DIR([m4])
 
 dnl Checks for programs.
