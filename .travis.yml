@@ -26,7 +26,7 @@ matrix:
   allow_failures:
     - os: osx
       env: TASK=distcheck
-      
+
 before_install:
   - |
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
@@ -43,7 +43,13 @@ script:
   - export
   - autoreconf -iv
   - ./configure $CONFIG_FLAGS
-  - make $TASK
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        make -j "$(nproc)" $TASK
+    fi
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        make -j "$(sysctl -n hw.activecpu)" $TASK
+    fi
 after_success:
   - test "x$CC" = "xgcc" -o "x$CC" = "xclang" && make code-coverage-capture && coveralls-lcov asn1c-*-coverage.info
 after_failure:
