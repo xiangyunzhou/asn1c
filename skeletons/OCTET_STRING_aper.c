@@ -347,9 +347,9 @@ OCTET_STRING_encode_aper(const asn_TYPE_descriptor_t *td,
                                       sizeinunits - csiz->lower_bound, 0);
                 if(ret) ASN__ENCODE_FAILED;
         }
-        if (csiz->effective_bits > 0 || (st->size > 2) 
+        if (csiz->effective_bits > 0 || (st->size > 2)
             || (csiz->upper_bound > (2 * 8 / unit_bits))
-            || (csiz->range_bits != 0)) 
+            || (csiz->range_bits != 0))
         { /* X.691 #16 NOTE 1 for fixed length (<=16 bits) strings*/
             if (aper_put_align(po) < 0)
                 ASN__ENCODE_FAILED;

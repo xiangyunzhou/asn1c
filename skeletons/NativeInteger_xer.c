@@ -27,7 +27,7 @@ NativeInteger_decode_xer(const asn_codec_ctx_t *opt_codec_ctx,
     }
 
     memset(&st, 0, sizeof(st));
-    rval = INTEGER_decode_xer(opt_codec_ctx, td, &st_ptr, 
+    rval = INTEGER_decode_xer(opt_codec_ctx, td, &st_ptr,
                               opt_mname, buf_ptr, size);
     if(rval.code == RC_OK) {
         long l;
