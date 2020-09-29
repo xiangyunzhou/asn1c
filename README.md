@@ -52,7 +52,7 @@ CANONICAL-XER  | xer_encode(XER_F_CANONICAL)| *-XER | xer_decode()
 If you haven't installed the asn1c yet, read the [INSTALL.md](INSTALL.md) file
 for a short installation guide.
 
-[![Build Status](https://travis-ci.org/vlm/asn1c.svg?branch=master)](https://travis-ci.org/vlm/asn1c)
+[![Build Status](https://travis-ci.org/mouse07410/asn1c.svg?branch=master)](https://travis-ci.org/mouse07410/asn1c)
 
 # Documentation
 
