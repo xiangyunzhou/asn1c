@@ -109,18 +109,3 @@ asn1p_oid_compare(const asn1p_oid_t *a, const asn1p_oid_t *b) {
 			return 1+i;
 	}
 }
-
-int
-asn1p_oid_compare_opt(const asn1p_oid_t *a, const asn1p_oid_t *b, int oid_options) {
-	int r = asn1p_oid_compare(a, b);
-	if(oid_options == OID_WITH_SUCCESSORS) {
-		if(r == a->arcs_count && r == b->arcs_count) /* positive and last arc */
-	    	r = 0;
-	} else if(oid_options == OID_WITH_DESCENDANTS) {
-		if(a->arcs_count == (0 - r))
-			r = 0;
-	}
-	return r;
-}
-
-

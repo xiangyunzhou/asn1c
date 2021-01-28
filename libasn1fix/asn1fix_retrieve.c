@@ -149,8 +149,15 @@ asn1f_lookup_module(arg_t *arg, const char *module_name, const asn1p_oid_t *oid,
 	TQ_FOR(mod, &(arg->asn->modules), mod_next) {
 		if(oid) {
 			if(mod->module_oid) {
-				if(0 == asn1p_oid_compare_opt(oid,
-					mod->module_oid, oid_option)) {
+				int r = asn1p_oid_compare(oid, mod->module_oid);
+				if(oid_option == XPT_WITH_SUCCESSORS) {
+					if(r == oid->arcs_count && r == mod->module_oid->arcs_count) /* positive and last arc */
+	    				r = 0;
+				} else if(oid_option == XPT_WITH_DESCENDANTS) {
+					if(oid->arcs_count == (-1 - r))
+						r = 0;
+				}
+				if(0 == r) {
 					/* Match! Even if name doesn't. */
 					oid = mod->module_oid;
 					ret = mod;

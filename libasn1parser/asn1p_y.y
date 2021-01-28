@@ -769,10 +769,10 @@ ImportsElement:
 
 ImportSelectionOption:
 	TOK_WITH TOK_SUCCESSORS {
-		$$ = OID_WITH_SUCCESSORS;
+		$$ = XPT_WITH_SUCCESSORS;
 	}
 	| TOK_WITH TOK_DESCENDANTS {
-		$$ = OID_WITH_DESCENDANTS;
+		$$ = XPT_WITH_DESCENDANTS;
 	}
 	;
 
