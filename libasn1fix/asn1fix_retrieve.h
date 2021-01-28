@@ -31,7 +31,7 @@ asn1p_module_t *asn1f_lookup_in_imports(arg_t *arg, asn1p_module_t *mod, const c
  */
 asn1p_module_t *asn1f_lookup_module(arg_t *arg,
 		const char *module_name,
-		const asn1p_oid_t *module_oid);
+		const asn1p_oid_t *module_oid, int oid_option);
 
 /*
  * Return the reference to a destination of the given reference,

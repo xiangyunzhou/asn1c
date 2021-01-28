@@ -53,7 +53,7 @@ asn1f_lookup_in_imports(arg_t *arg, asn1p_module_t *mod, const char *name) {
 	 */
 	TQ_FOR(xp, &(mod->imports), xp_next) {
         asn1p_module_t *fromModule =
-            asn1f_lookup_module(arg, xp->fromModuleName, NULL);
+            asn1f_lookup_module(arg, xp->fromModuleName, NULL, 0);
         asn1p_expr_t *tc = (asn1p_expr_t *)0;
 
         TQ_FOR(tc, &(xp->xp_members), next) {
@@ -78,7 +78,7 @@ asn1f_lookup_in_imports(arg_t *arg, asn1p_module_t *mod, const char *name) {
 	 * Okay, right now we have a module name and, hopefully, an OID.
 	 * Search the arg->asn for the specified module.
 	 */
-	mod = asn1f_lookup_module(arg, xp->fromModuleName, xp->identifier.oid);
+	mod = asn1f_lookup_module(arg, xp->fromModuleName, xp->identifier.oid, xp->option);
 	if(mod == NULL) {
 		/* Conditional debug */
 		if(!(arg->expr->_mark & TM_BROKEN)) {
@@ -106,8 +106,8 @@ asn1f_lookup_in_imports(arg_t *arg, asn1p_module_t *mod, const char *name) {
 }
 
 asn1p_module_t *
-asn1f_lookup_module(arg_t *arg, const char *module_name, const asn1p_oid_t *oid) {
-	asn1p_module_t *mod;
+asn1f_lookup_module(arg_t *arg, const char *module_name, const asn1p_oid_t *oid, int oid_option) {
+	asn1p_module_t *mod, *ret = NULL;
 
 	assert(module_name);
 
@@ -149,27 +149,25 @@ asn1f_lookup_module(arg_t *arg, const char *module_name, const asn1p_oid_t *oid)
 	TQ_FOR(mod, &(arg->asn->modules), mod_next) {
 		if(oid) {
 			if(mod->module_oid) {
-				if(asn1p_oid_compare(oid,
-					mod->module_oid)) {
-					continue;
-				} else {
+				if(0 == asn1p_oid_compare_opt(oid,
+					mod->module_oid, oid_option)) {
 					/* Match! Even if name doesn't. */
-					return mod;
+					oid = mod->module_oid;
+					ret = mod;
 				}
-			} else {
-				/* Not match, even if name is the same. */
-				continue;
 			}
+			/* Not match, even if name is the same. */
+			continue;
 		}
 	
 		if(strcmp(module_name, mod->ModuleName) == 0)
 			return mod;
 	}
-
-	DEBUG("\tModule \"%s\" not found", module_name);
-
-	errno = ENOENT;
-	return NULL;
+	if(ret == NULL) {
+		DEBUG("\tModule \"%s\" not found", module_name);
+		errno = ENOENT;
+	}
+	return ret;
 }
 
 static asn1p_expr_t *
@@ -268,7 +266,7 @@ asn1f_lookup_symbol_impl(arg_t *arg, asn1p_expr_t *rhs_pspecs, const asn1p_ref_t
      * switch namespace to that module.
      */
     if(modulename) {
-        imports_from = asn1f_lookup_module(arg, modulename, 0);
+        imports_from = asn1f_lookup_module(arg, modulename, 0, 0);
         if(imports_from == NULL) {
             FATAL(
                 "Module \"%s\" "

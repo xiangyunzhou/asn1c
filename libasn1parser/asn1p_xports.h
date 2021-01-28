@@ -23,6 +23,8 @@ typedef struct asn1p_xports_s {
 		asn1p_value_t *value;	/* DefinedValue */
 	} identifier;
 
+	int option;  /* (0) | WITH SUCCESSORS (1) | WITH DESCENDANTS (2) */
+
 	/*
 	 * Number of entities to import.
 	 */

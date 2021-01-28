@@ -63,5 +63,9 @@ void asn1p_oid_free(asn1p_oid_t *);
  */
 int asn1p_oid_compare(const asn1p_oid_t *a, const asn1p_oid_t *b);
 
+#define OID_WITH_SUCCESSORS  1
+#define OID_WITH_DESCENDANTS 2
+int asn1p_oid_compare_opt(const asn1p_oid_t *a, const asn1p_oid_t *b, int oid_option);
+
 
 #endif	/* ASN1_PARSER_OID_H */

@@ -89,26 +89,37 @@ asn1p_oid_compare(const asn1p_oid_t *a, const asn1p_oid_t *b) {
 
 		if(b->arcs_count > i) {
 			if(a->arcs_count <= i)
-				return -1;
+				return -1-i;
 		} else if(a->arcs_count > i) {
 			if(b->arcs_count <= i)
-				return 1;
+				return 1+i;
 		} else if(b->arcs_count <= i && a->arcs_count <= i) {
 			cmp = b->arcs_count - a->arcs_count;
 			if(cmp < 0)
-				return -1;
+				return -1-i;
 			else if(cmp > 0)
-				return 1;
+				return 1+i;
 			return 0;
 		}
 
 		cmp = b->arcs[i].number - a->arcs[i].number;
 		if(cmp < 0)
-			return -1;
+			return -1-i;
 		else if(cmp > 0)
-			return 1;
+			return 1+i;
 	}
+}
 
+int
+asn1p_oid_compare_opt(const asn1p_oid_t *a, const asn1p_oid_t *b, int oid_options) {
+	int r = asn1p_oid_compare(a, b);
+	if(oid_options == OID_WITH_SUCCESSORS) {
+		if(r == b->arcs_count) /* positive and last arc */
+	    	r = 0;
+	} else if(oid_options == OID_WITH_DESCENDANTS) {
+		/* not supported yet */
+	}
+	return r;
 }
 
 

@@ -42,7 +42,7 @@ asn1f_lookup_module_ex(asn1p_t *asn, const char *module_name,
     arg.asn = asn;
     arg.eh = a1f_replace_me_with_proper_interface_arg.eh;
     arg.debug = a1f_replace_me_with_proper_interface_arg.debug;
-    return asn1f_lookup_module(&arg, module_name, oid);
+    return asn1f_lookup_module(&arg, module_name, oid, 0);
 }
 
 asn1p_expr_t *
