@@ -294,7 +294,7 @@ per_imax_range_unrebase(uintmax_t inp, intmax_t lb, intmax_t ub, intmax_t *outp)
     }
 
     if(inp <= INTMAX_MAX) {
-        *outp = (long)inp + lb;
+        *outp = (intmax_t)inp + lb;
     } else {
         *outp = (lb + INTMAX_MAX + 1) + (intmax_t)((inp - INTMAX_MAX) - 1);
     }
