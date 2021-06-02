@@ -3,6 +3,7 @@
 # Test diff(1) capabilities
 diff -a . . 2>/dev/null && diffArgs="-a"		# Assume text files
 diff -u . . 2>/dev/null && diffArgs="$diffArgs -u"	# Unified diff output
+diff -w . . 2>/dev/null && diffArgs="$diffArgs -w"	# Number of whitespaces not relevant
 
 finalExitCode=0
 
