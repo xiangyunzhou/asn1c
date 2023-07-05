@@ -455,11 +455,8 @@ all: InterchangedObject.c $(TARGET)
 $(TARGET): ${OBJS}
 	$(CC) $(CFLAGS) -o $(TARGET) ${OBJS} $(LDFLAGS) $(LIBS)
 
-.SUFFIXES:
-.SUFFIXES: .c .o
-
-.c.o:
-	$(CC) $(CFLAGS) -o $@ -c $<
+%.o: %.c
+	$(CC) -fPIC $(CFLAGS) -o $@ -c $<
 
 clean:
 	rm -f $(TARGET)
