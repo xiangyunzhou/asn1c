@@ -456,7 +456,7 @@ $(TARGET): ${OBJS}
 	$(CC) $(CFLAGS) -o $(TARGET) ${OBJS} $(LDFLAGS) $(LIBS)
 
 %.o: %.c
-	$(CC) -fPIC $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 clean:
 	rm -f $(TARGET)
