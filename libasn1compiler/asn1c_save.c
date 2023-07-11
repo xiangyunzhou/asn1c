@@ -275,7 +275,7 @@ asn1c__save_example_mk_makefile(arg_t *arg, const asn1c_dep_chainset *deps,
 		"\n$(ASN_LIBRARY): $(ASN_MODULE_SRCS:.c=.o)"
 		"\n\t$(AR) rcs $@ $(ASN_MODULE_SRCS:.c=.o)\n"
 		"\n%%.o: %%.c"
-		"\n$(CC) $(CFLAGS) -o $@ -c $<\n"
+		"\n\t$(CC) $(CFLAGS) -o $@ -c $<\n"
 		"\nclean:"
 		"\n\trm -f $(ASN_PROGRAM) $(ASN_LIBRARY)"
 		"\n\trm -f $(ASN_MODULE_SRCS:.c=.o) $(ASN_PROGRAM_SRCS:.c=.o)\n"
