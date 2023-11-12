@@ -63,5 +63,4 @@ void asn1p_oid_free(asn1p_oid_t *);
  */
 int asn1p_oid_compare(const asn1p_oid_t *a, const asn1p_oid_t *b);
 
-
 #endif	/* ASN1_PARSER_OID_H */
