@@ -40,6 +40,8 @@ CHOICE_decode_aper(const asn_codec_ctx_t *opt_codec_ctx,
         value = per_get_few_bits(pd, 1);
         if(value < 0) ASN__DECODE_STARVED;
         if(value) ct = 0;  /* Not restricted */
+        if((unsigned)value >= td->elements_count)
+            ASN__DECODE_FAILED;
     }
 
     if(ct && ct->range_bits >= 0) {
