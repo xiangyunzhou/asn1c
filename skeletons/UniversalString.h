@@ -38,6 +38,7 @@ xer_type_encoder_f UniversalString_encode_xer;
 #endif  /* !defined(ASN_DISABLE_XER_SUPPORT) */
 
 #if !defined(ASN_DISABLE_JER_SUPPORT)
+jer_type_decoder_f UniversalString_decode_jer;
 jer_type_encoder_f UniversalString_encode_jer;
 #endif  /* !defined(ASN_DISABLE_JER_SUPPORT) */
 
