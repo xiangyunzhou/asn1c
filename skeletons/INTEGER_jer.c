@@ -18,63 +18,6 @@ struct je2v_key {
 * Should be joined in the future.
 */
 static int
-INTEGER__jer_compar_enum2value(const void *kp, const void *am) {
-    const struct je2v_key *key = (const struct je2v_key *)kp;
-    const asn_INTEGER_enum_map_t *el = (const asn_INTEGER_enum_map_t *)am;
-    const char *ptr, *end, *name;
-
-    /* Remap the element (sort by different criterion) */
-    el = key->vemap + key->evmap[el - key->vemap];
-
-    /* Compare strings */
-    for(ptr = key->start, end = key->stop, name = el->enum_name;
-            ptr < end; ptr++, name++) {
-        if(*ptr != *name || !*name)
-            return *(const unsigned char *)ptr - *(const unsigned char *)name;
-    }
-    return name[0] ? -1 : 0;
-}
-
-static const asn_INTEGER_enum_map_t *
-INTEGER_jer_map_enum2value(const asn_INTEGER_specifics_t *specs, const char *lstart,
-                       const char *lstop) {
-    const asn_INTEGER_enum_map_t *el_found;
-    int count = specs ? specs->map_count : 0;
-    struct je2v_key key;
-    const char *lp;
-
-    if(!count) return NULL;
-
-    /* Guaranteed: assert(lstart < lstop); */
-    /* Figure out the tag name */
-    for(lstart++, lp = lstart; lp < lstop; lp++) {
-        switch(*lp) {
-        case 9: case 10: case 11: case 12: case 13: case 32: /* WSP */
-        case 0x22: /* '"' */
-            break;
-        default:
-            continue;
-        }
-        break;
-    }
-    if(lp == lstop) return NULL;  /* No tag found */
-    lstop = lp;
-
-    key.start = lstart;
-    key.stop = lstop;
-    key.vemap = specs->value2enum;
-    key.evmap = specs->enum2value;
-    el_found = (asn_INTEGER_enum_map_t *)bsearch(&key,
-        specs->value2enum, count, sizeof(specs->value2enum[0]),
-        INTEGER__jer_compar_enum2value);
-    if(el_found) {
-        /* Remap enum2value into value2enum */
-        el_found = key.vemap + key.evmap[el_found - key.vemap];
-    }
-    return el_found;
-}
-
-static int
 INTEGER_jer_st_prealloc(INTEGER_t *st, int min_size) {
     void *p = MALLOC(min_size + 1);
     if(p) {
@@ -97,21 +40,15 @@ INTEGER__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
         (const asn_INTEGER_specifics_t *)td->specifics;
     INTEGER_t *st = (INTEGER_t *)sptr;
     intmax_t dec_value;
-    intmax_t hex_value = 0;
     const char *lp;
     const char *lstart = (const char *)chunk_buf;
     const char *lstop = lstart + chunk_size;
     enum {
         ST_LEADSPACE,
-        ST_SKIPSPHEX,
         ST_WAITDIGITS,
         ST_DIGITS,
+        ST_ZERO,
         ST_DIGITS_TRAILSPACE,
-        ST_HEXDIGIT1,
-        ST_HEXDIGIT2,
-        ST_HEXDIGITS_TRAILSPACE,
-        ST_HEXCOLON,
-        ST_END_ENUM,
         ST_UNEXPECTED
     } state = ST_LEADSPACE;
     const char *dec_value_start = 0; /* INVARIANT: always !0 in ST_DIGITS */
@@ -135,15 +72,11 @@ INTEGER__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
             switch(state) {
             case ST_LEADSPACE:
             case ST_DIGITS_TRAILSPACE:
-            case ST_HEXDIGITS_TRAILSPACE:
-            case ST_SKIPSPHEX:
                 continue;
             case ST_DIGITS:
+            case ST_ZERO:
                 dec_value_end = lp;
                 state = ST_DIGITS_TRAILSPACE;
-                continue;
-            case ST_HEXCOLON:
-                state = ST_HEXDIGITS_TRAILSPACE;
                 continue;
             default:
                 break;
@@ -157,30 +90,26 @@ INTEGER__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
                 continue;
             }
             break;
-        case 0x2b:  /* '+' */
-            if(state == ST_LEADSPACE) {
+        case 0x30: /* 0 */
+            switch(state) {
+            case ST_DIGITS: continue;
+            case ST_LEADSPACE:
+            case ST_WAITDIGITS:
                 dec_value = 0;
                 dec_value_start = lp;
-                state = ST_WAITDIGITS;
+                state = ST_ZERO;
                 continue;
+            case ST_ZERO: /* forbidden leading zero */
+                return JPBD_BROKEN_ENCODING;
+            default:
+                break;
             }
             break;
-        case 0x30: case 0x31: case 0x32: case 0x33: case 0x34:
+        /* [1-9] */
+        case 0x31: case 0x32: case 0x33: case 0x34:
         case 0x35: case 0x36: case 0x37: case 0x38: case 0x39:
             switch(state) {
             case ST_DIGITS: continue;
-            case ST_SKIPSPHEX:  /* Fall through */
-            case ST_HEXDIGIT1:
-                hex_value = (lv - 0x30) << 4;
-                state = ST_HEXDIGIT2;
-                continue;
-            case ST_HEXDIGIT2:
-                hex_value += (lv - 0x30);
-                state = ST_HEXCOLON;
-                st->buf[st->size++] = (uint8_t)hex_value;
-                continue;
-            case ST_HEXCOLON:
-                return JPBD_BROKEN_ENCODING;
             case ST_LEADSPACE:
                 dec_value = 0;
                 dec_value_start = lp;
@@ -188,70 +117,8 @@ INTEGER__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
             case ST_WAITDIGITS:
                 state = ST_DIGITS;
                 continue;
-            default:
-                break;
-            }
-            break;
-        case 0x22:  /* '<', start of XML encoded enumeration */
-            if(state == ST_LEADSPACE) {
-                const asn_INTEGER_enum_map_t *el;
-                el = INTEGER_jer_map_enum2value(
-                    (const asn_INTEGER_specifics_t *)
-                    td->specifics, lstart, lstop);
-                if(el) {
-                    ASN_DEBUG("Found \"%s\" => %ld",
-                              el->enum_name, el->nat_value);
-                    dec_value = el->nat_value;
-                    state = ST_END_ENUM;
-                    lp = lstop - 1;
-                    continue;
-                }
-                ASN_DEBUG("Unknown identifier for INTEGER");
-            }
-            return JPBD_BROKEN_ENCODING;
-        case 0x3a:  /* ':' */
-            if(state == ST_HEXCOLON) {
-                /* This colon is expected */
-                state = ST_HEXDIGIT1;
-                continue;
-            } else if(state == ST_DIGITS) {
-                /* The colon here means that we have
-                 * decoded the first two hexadecimal
-                 * places as a decimal value.
-                 * Switch decoding mode. */
-                ASN_DEBUG("INTEGER re-evaluate as hex form");
-                state = ST_SKIPSPHEX;
-                dec_value_start = 0;
-                lp = lstart - 1;
-                continue;
-            } else {
-                ASN_DEBUG("state %d at %ld", state, (long)(lp - lstart));
-                break;
-            }
-        /* [A-Fa-f] */
-        case 0x41:case 0x42:case 0x43:case 0x44:case 0x45:case 0x46:
-        case 0x61:case 0x62:case 0x63:case 0x64:case 0x65:case 0x66:
-            switch(state) {
-            case ST_SKIPSPHEX:
-            case ST_LEADSPACE: /* Fall through */
-            case ST_HEXDIGIT1:
-                hex_value = lv - ((lv < 0x61) ? 0x41 : 0x61);
-                hex_value += 10;
-                hex_value <<= 4;
-                state = ST_HEXDIGIT2;
-                continue;
-            case ST_HEXDIGIT2:
-                hex_value += lv - ((lv < 0x61) ? 0x41 : 0x61);
-                hex_value += 10;
-                st->buf[st->size++] = (uint8_t)hex_value;
-                state = ST_HEXCOLON;
-                continue;
-            case ST_DIGITS:
-                ASN_DEBUG("INTEGER re-evaluate as hex form");
-                state = ST_SKIPSPHEX;
-                dec_value_start = 0;
-                lp = lstart - 1;
-                continue;
+            case ST_ZERO: /* forbidden leading zero */
+                return JPBD_BROKEN_ENCODING;
             default:
                 break;
             }
@@ -266,10 +133,8 @@ INTEGER__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
     }
 
     switch(state) {
-    case ST_END_ENUM:
-        /* Got a complete and valid enumeration encoded as a tag. */
-        break;
     case ST_DIGITS:
+    case ST_ZERO:
         dec_value_end = lstop;
         /* FALL THROUGH */
     case ST_DIGITS_TRAILSPACE:
@@ -297,14 +162,6 @@ INTEGER__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
             return JPBD_BROKEN_ENCODING;
         }
         break;
-    case ST_HEXCOLON:
-    case ST_HEXDIGITS_TRAILSPACE:
-        st->buf[st->size] = 0;  /* Just in case termination */
-        return JPBD_BODY_CONSUMED;
-    case ST_HEXDIGIT1:
-    case ST_HEXDIGIT2:
-    case ST_SKIPSPHEX:
-        return JPBD_BROKEN_ENCODING;
     case ST_LEADSPACE:
         /* Content not found */
         return JPBD_NOT_BODY_IGNORE;
