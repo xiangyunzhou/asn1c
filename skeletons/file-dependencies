@@ -17,7 +17,7 @@ IA5String.h IA5String.c OCTET_STRING.h
 INTEGER.h INTEGER.c
 ISO646String.h ISO646String.c OCTET_STRING.h
 NULL.h NULL.c
-NativeEnumerated.h NativeEnumerated.c NativeInteger.h
+NativeEnumerated.h NativeEnumerated.c NativeInteger.h ENUMERATED.h
 NativeInteger.h NativeInteger.c INTEGER.h
 NativeReal.h NativeReal.c REAL.h
 NumericString.h NumericString.c OCTET_STRING.h
@@ -253,6 +253,7 @@ ANY.h ANY_jer.c
 BIT_STRING.h BIT_STRING_jer.c
 BMPString.h BMPString_jer.c
 BOOLEAN.h BOOLEAN_jer.c
+ENUMERATED.h ENUMERATED_jer.c
 GeneralizedTime.h GeneralizedTime_jer.c
 INTEGER.h INTEGER_jer.c
 NULL.h NULL_jer.c

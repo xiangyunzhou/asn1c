@@ -127,6 +127,7 @@ libasn1cskeletons_la_SOURCES =                  \
     BOOLEAN_xer.c                               \
     BOOLEAN_jer.c                               \
     ENUMERATED_aper.c                           \
+    ENUMERATED_jer.c                            \
     ENUMERATED_oer.c                            \
     ENUMERATED_uper.c                           \
     GeneralizedTime_ber.c                       \

@@ -35,7 +35,7 @@ asn_TYPE_operation_t asn_OP_ENUMERATED = {
     0,
 #endif  /* !defined(ASN_DISABLE_XER_SUPPORT) */
 #if !defined(ASN_DISABLE_JER_SUPPORT)
-    INTEGER_decode_jer,
+    ENUMERATED_decode_jer,
     INTEGER_encode_jer,
 #else
     0,

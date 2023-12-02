@@ -31,7 +31,7 @@ INTEGER_jer_st_prealloc(INTEGER_t *st, int min_size) {
     }
 }
 /*
- * Decode the chunk of XML text encoding INTEGER.
+ * Decode the chunk of JSON text encoding INTEGER.
  */
 static enum jer_pbd_rval
 INTEGER__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
