@@ -6,11 +6,14 @@
 #include <asn_internal.h>
 #include <RELATIVE-OID.h>
 
+#define CQUOTE 0x22
+
 static enum jer_pbd_rval
 RELATIVE_OID__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
                               const void *chunk_buf, size_t chunk_size) {
     RELATIVE_OID_t *st = (RELATIVE_OID_t *)sptr;
     const char *chunk_end = (const char *)chunk_buf + chunk_size;
+    const char* p = (const char*)chunk_buf;
     const char *endptr;
     asn_oid_arc_t s_arcs[6];
     asn_oid_arc_t *arcs = s_arcs;
@@ -18,6 +21,22 @@ RELATIVE_OID__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
     int ret;
 
     (void)td;
+
+    /* Strip quotes */
+    for (; p < chunk_end; ++p) {
+        if (*p == CQUOTE) {
+            ++p;
+            break;
+        }
+    }
+    for (; chunk_end >= p; --chunk_end) {
+        if (*chunk_end == CQUOTE) 
+            break;
+    }
+    if (chunk_end - p < 0) 
+        return JPBD_BROKEN_ENCODING;
+    chunk_size = chunk_end - p;
+    chunk_buf = p;
 
     num_arcs = OBJECT_IDENTIFIER_parse_arcs(
         (const char *)chunk_buf, chunk_size, arcs,
@@ -65,6 +84,7 @@ RELATIVE_OID_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
                         asn_app_consume_bytes_f *cb, void *app_key) {
     const RELATIVE_OID_t *st = (const RELATIVE_OID_t *)sptr;
     asn_enc_rval_t er = {0,0,0};
+    ssize_t ro_encoded = 0;
 
     (void)ilevel;  /* Unused argument */
     (void)flags;  /* Unused argument */
@@ -72,8 +92,14 @@ RELATIVE_OID_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
     if(!st || !st->buf)
         ASN__ENCODE_FAILED;
 
-    er.encoded = RELATIVE_OID__dump_body(st, cb, app_key);
-    if(er.encoded < 0) ASN__ENCODE_FAILED;
+    ASN__CALLBACK("\"", 1);
+    ro_encoded = RELATIVE_OID__dump_body(st, cb, app_key);
+    if(ro_encoded < 0) goto cb_failed;
+    er.encoded += ro_encoded;
+    ASN__CALLBACK("\"", 1);
 
     ASN__ENCODED_OK(er);
+
+cb_failed:
+    ASN__ENCODE_FAILED;
 }
