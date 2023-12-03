@@ -200,19 +200,18 @@ static ssize_t OCTET_STRING__convert_hexadecimal(void *sptr, const void *chunk_b
     int half = 0;	/* Half bit */
     uint8_t *buf;
 
+    /* Strip quotes */
     for (; p < pend; ++p) {
-        if (*p == CQUOTE) 
+        if (*p == CQUOTE) {
+            ++p;
             break;
+        }
     }
-    ++p;
-
-    for (; pend > p; --pend) {
+    for (; pend >= p; --pend) {
         if (*pend == CQUOTE) 
             break;
     }
-
-    if (pend - p < 2) return -1;
-
+    if (pend - p < 0) return -1;
     chunk_size = pend - p;
 
     /* Reallocate buffer according to high cap estimation */
