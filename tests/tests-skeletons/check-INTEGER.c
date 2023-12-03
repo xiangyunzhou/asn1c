@@ -5,6 +5,7 @@
 #include <INTEGER.h>
 
 #define CHECK_XER(a,b,c)        check_xer(__LINE__, a, b, c)
+#define CHECK_JER(a,b,c)        check_jer(__LINE__, a, b, c)
 
 static char *shared_scratch_start;
 
@@ -167,6 +168,39 @@ check_xer(int lineno, int tofail, char *xmldata, long orig_value) {
                 printf("\tnot failed, as expected!\n");
 	        assert(!tofail);
         }
+
+	ret = asn_INTEGER2long(st, &value);
+	assert(ret == 0);
+
+	printf("\t%ld\n", value);
+
+	assert(value == orig_value);
+
+	ASN_STRUCT_FREE(asn_DEF_INTEGER, st);
+}
+
+static void
+check_jer(int lineno, int tofail, char *jsondata, long orig_value) {
+	INTEGER_t *st = 0;
+	asn_dec_rval_t rc;
+	long value;
+	int ret;
+
+	printf("%03d: [%s] vs %ld: ", lineno, jsondata, orig_value);
+    fflush(stdout);
+
+	rc = jer_decode(0, &asn_DEF_INTEGER, (void *)&st,
+		jsondata, strlen(jsondata));
+	if(rc.code != RC_OK) {
+		assert(tofail);
+		printf("\tfailed, as expected\n");
+		ASN_STRUCT_FREE(asn_DEF_INTEGER, st);
+		return;
+	}
+    if(tofail) {
+        printf("\tnot failed, as expected!\n");
+	    assert(!tofail);
+    }
 
 	ret = asn_INTEGER2long(st, &value);
 	assert(ret == 0);
@@ -419,6 +453,91 @@ main() {
 	} else {
                 assert(sizeof(long) == 8);
         }
+#endif
+
+	CHECK_JER(-1, "", 0);
+	CHECK_JER(-1, "{\"INTEGER\":}", 0);
+	CHECK_JER(-1, "{\"INTEGER\": }", 0);
+	CHECK_JER(-1, "{\"INTEGER\":-}", 0);
+	CHECK_JER(-1, "{\"INTEGER\":+}", 0);
+	CHECK_JER(-1, "{\"INTEGER\":+-}", 0);
+	CHECK_JER(-1, "{\"INTEGER\": -}", 0);
+	CHECK_JER(-1, "{\"INTEGER\": +}", 0);
+	CHECK_JER(-1, "{\"INTEGER\": +-}", 0);
+	CHECK_JER(-1, "{\"INTEGER\":- }", 0);
+	CHECK_JER(-1, "{\"INTEGER\":+ }", 0);
+	CHECK_JER(-1, "{\"INTEGER\":+- }", 0);
+	CHECK_JER(-1, "{\"INTEGER\": - }", 0);
+	CHECK_JER(-1, "{\"INTEGER\": + }", 0);
+	CHECK_JER(-1, "{\"INTEGER\": +- }", 0);
+	CHECK_JER(-1, "{\"INTEGER\":+0}", 0);
+	CHECK_JER(0, "{\"INTEGER\":-0}", 0);
+	CHECK_JER(-1, "{\"INTEGER\":+1}", 0);
+	CHECK_JER(0, "{\"INTEGER\":-1}", -1);
+	CHECK_JER(0, "{\"INTEGER\":1}", 1);
+	CHECK_JER(0, "{\"INTEGER\":-15}", -15);
+	CHECK_JER(-1, "{\"INTEGER\":+15}", 0);
+	CHECK_JER(0, "{\"INTEGER\":15}", 15);
+	CHECK_JER(0, "{\"INTEGER\": 15}", 15);
+	CHECK_JER(0, "{\"INTEGER\": 15 }", 15);
+	CHECK_JER(0, "{\"INTEGER\":15 }", 15);
+	CHECK_JER(-1, "{\"INTEGER\": +15 }", 0);
+	CHECK_JER(-1, "{\"INTEGER\": 015 }", 0);
+	CHECK_JER(-1, "{\"INTEGER\":015 }", 0);
+	CHECK_JER(-1, "{\"INTEGER\": 015}", 0);
+	CHECK_JER(-1, "{\"INTEGER\": 0 15}", 0);
+	CHECK_JER(-1, "{\"INTEGER\": 0 15 }", 0);
+	CHECK_JER(-1, "{\"INTEGER\":0 15}", 0);
+	CHECK_JER(-1, "{\"INTEGER\": +15 -}", 0);
+	CHECK_JER(-1, "{\"INTEGER\": +15 1}", 0);
+	CHECK_JER(-1, "{\"INTEGER\":+ 15}", 0);
+	CHECK_JER(-1, "{\"INTEGER\":12e34}", 0);
+	CHECK_JER(-1, "{\"INTEGER\":12 e34}", 0);
+	CHECK_JER(-1, "{\"INTEGER\":12 e}", 0);
+	CHECK_JER(0, "{\"INTEGER\":1234}", 1234);
+	CHECK_JER(-1, "{\"INTEGER\":1234 5678}", 0);
+	CHECK_JER(0, "{\"INTEGER\":-2147483647}", -2147483647);
+	CHECK_JER(0, "{\"INTEGER\":-2147483648}", -2147483647-1);
+	CHECK_JER(-1, "{\"INTEGER\":+2147483647}", 0);
+	CHECK_JER(0, "{\"INTEGER\":2147483647}", 2147483647);
+	if(sizeof(long) == 4) {
+		CHECK_JER( 0, "{\"INTEGER\":-2147483648}", -2147483648);
+		CHECK_JER(-1, "{\"INTEGER\":-2147483649}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":2147483648}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":2147483649}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":3147483649}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":4147483649}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":5147483649}", 0); /* special */
+		CHECK_JER(-1, "{\"INTEGER\":9147483649}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":9999999999}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":-5147483649}", 0);/* special */
+		CHECK_JER(-1, "{\"INTEGER\":-9147483649}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":-9999999999}", 0);
+	}
+#ifdef  TEST_64BIT
+	if(sizeof(long) == 8) {
+		CHECK_JER(0, "{\"INTEGER\":2147483648}", 2147483648);
+		CHECK_JER(0, "{\"INTEGER\":2147483649}", 2147483649);
+		CHECK_JER(0, "{\"INTEGER\":3147483649}", 3147483649);
+		CHECK_JER(0, "{\"INTEGER\":4147483649}", 4147483649);
+		CHECK_JER(0, "{\"INTEGER\":5147483649}", 5147483649);
+		CHECK_JER(0, "{\"INTEGER\":9147483649}", 9147483649);
+		CHECK_JER(0, "{\"INTEGER\":9999999999}", 9999999999);
+		CHECK_JER(0, "{\"INTEGER\":9223372036854775807}", 9223372036854775807);
+		CHECK_JER(-1, "{\"INTEGER\":9223372036854775808}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":10223372036854775807}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":50223372036854775807}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":100223372036854775807}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":500223372036854775807}", 0);
+		CHECK_JER(0, "{\"INTEGER\":-9223372036854775808}", -9223372036854775807-1);
+		CHECK_JER(-1, "{\"INTEGER\":-9223372036854775809}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":-10223372036854775807}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":-50223372036854775807}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":-100223372036854775807}", 0);
+		CHECK_JER(-1, "{\"INTEGER\":-500223372036854775807}", 0);
+	} else {
+        assert(sizeof(long) == 8);
+    }
 #endif
 
     check_strtoimax();
