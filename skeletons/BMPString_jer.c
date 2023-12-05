@@ -79,6 +79,7 @@ BMPString_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
                      asn_app_consume_bytes_f *cb, void *app_key) {
     const BMPString_t *st = (const BMPString_t *)sptr;
     asn_enc_rval_t er = {0,0,0};
+    ssize_t ro_encoded = 0;
 
     (void)ilevel;
     (void)flags;
@@ -86,8 +87,14 @@ BMPString_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
     if(!st || !st->buf)
         ASN__ENCODE_FAILED;
 
-    er.encoded = BMPString__dump(st, cb, app_key);
-    if(er.encoded < 0) ASN__ENCODE_FAILED;
+    ASN__CALLBACK("\"", 1);
+    ro_encoded = BMPString__dump(st, cb, app_key);
+    if(ro_encoded < 0) goto cb_failed;
+    er.encoded += ro_encoded;
+    ASN__CALLBACK("\"", 1);
 
     ASN__ENCODED_OK(er);
+
+cb_failed:
+    ASN__ENCODE_FAILED;
 }

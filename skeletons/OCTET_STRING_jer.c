@@ -160,6 +160,7 @@ OCTET_STRING_encode_jer_utf8(const asn_TYPE_descriptor_t *td, const void *sptr,
 
     buf = st->buf;
     end = buf + st->size;
+    ASN__CALLBACK("\"", 1);
     for(ss = buf; buf < end; buf++) {
         unsigned int ch = *buf;
         int s_len;	/* Special encoding sequence length */
@@ -180,10 +181,15 @@ OCTET_STRING_encode_jer_utf8(const asn_TYPE_descriptor_t *td, const void *sptr,
 
     encoded_len += (buf - ss);
     if((buf - ss) && cb(ss, buf - ss, app_key) < 0)
-        ASN__ENCODE_FAILED;
+        goto cb_failed;
 
-    er.encoded = encoded_len;
+    er.encoded += encoded_len;
+
+    ASN__CALLBACK("\"", 1);
     ASN__ENCODED_OK(er);
+
+cb_failed:
+    ASN__ENCODE_FAILED;
 }
 
 #define CQUOTE 0x22
@@ -333,8 +339,22 @@ OCTET_STRING__convert_entrefs(void *sptr, const void *chunk_buf,
     const char *pend = p + chunk_size;
     uint8_t *buf;
 
+    /* Strip quotes */
+    for(; p < pend; ++p) {
+        if (*p == CQUOTE) {
+            ++p;
+            break;
+        }
+    }
+    for(; pend >= p; --pend) {
+        if (*pend == CQUOTE) 
+            break;
+    }
+    if(pend - p < 0) 
+        return -1;
+
     /* Reallocate buffer */
-    size_t new_size = st->size + chunk_size;
+    size_t new_size = st->size + (pend - p);
     void *nptr = REALLOC(st->buf, new_size + 1);
     if(!nptr) return -1;
     st->buf = (uint8_t *)nptr;
