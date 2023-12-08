@@ -283,7 +283,7 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             break;
         }
 
-        ASN_DEBUG("Unexpected XML key in SEQUENCE [%c%c%c%c%c%c]",
+        ASN_DEBUG("Unexpected JSON key in SEQUENCE [%c%c%c%c%c%c]",
                   size>0?((const char *)ptr)[0]:'.',
                   size>1?((const char *)ptr)[1]:'.',
                   size>2?((const char *)ptr)[2]:'.',
@@ -350,8 +350,6 @@ SET_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
                                            cb, app_key);
         if(tmper.encoded == -1) return tmper;
         er.encoded += tmper.encoded;
-
-        //        ASN__CALLBACK3("</", 2, mname, mlen, ">", 1);
     }
 
     if(!xcan) ASN__TEXT_INDENT(1, ilevel - 1);

@@ -34,22 +34,6 @@
         consumed_myself += num;           \
     } while(0)
 
-#define JER_SAVE_STATE                        \
-    do {                                      \
-        ptr0 = ptr;                           \
-        size0 = size;                         \
-        consumed_myself0 = consumed_myself;   \
-        context0 = ctx->context;\
-    } while(0)
-
-#define JER_RESTORE_STATE                     \
-    do {                                      \
-        ptr = ptr0;                           \
-        size = size0;                         \
-        consumed_myself = consumed_myself0;   \
-        ctx->context = context0;        \
-    } while(0)
-
 /*
  * Decode the JER (JSON) data.
  */
@@ -63,7 +47,6 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
     const asn_SEQUENCE_specifics_t *specs
         = (const asn_SEQUENCE_specifics_t *)td->specifics;
     asn_TYPE_member_t *elements = td->elements;
-    const char *json_key = opt_mname ? opt_mname : td->xml_tag;
 
     /*
      * ... and parts of the structure being constructed.
@@ -88,15 +71,10 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
      */
     ctx = (asn_struct_ctx_t *)((char *)st + specs->ctx_offset);
 
-    const void* ptr0 = ptr;
-    size_t size0 = size;
-    ssize_t consumed_myself0 = consumed_myself;  /* Consumed bytes from ptr */
-    int context0 = ctx->context;
-
     /*
      * Phases of JER/JSON processing:
      * Phase 0: Check that the key matches our expectations.
-     * Phase 1: Processing body and reacting on closing key.
+     * Phase 1: Processing body and reacting on closing token.
      * Phase 2: Processing inner type.
      * Phase 3: Skipping unknown extensions.
      * Phase 4: PHASED OUT
@@ -166,7 +144,7 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             }
         }
 
-        scv = jer_check_sym(ptr, ch_size, ctx->phase == 0 ? json_key : NULL);
+        scv = jer_check_sym(ptr, ch_size, NULL);
         ASN_DEBUG("JER/SEQUENCE: scv = %d, ph=%d [%s]",
                   scv, ctx->phase, json_key);
 
@@ -194,7 +172,6 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
         case JCK_OEND:
             if(ctx->phase == 0) break;
             ctx->phase = 0;
-            /* Fall through */
 
             if(edx >= td->elements_count ||
                /* Explicit OPTIONAL specs reaches the end */
@@ -202,15 +179,18 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                /* All extensions are optional */
                IN_EXTENSION_GROUP(specs, edx)) {
                 JER_ADVANCE(ch_size);
+                JER_ADVANCE(jer_whitespace_span(ptr, size)); 
                 ctx->phase = 4; /* Phase out */
                 RETURN(RC_OK);
             } else {
                 ASN_DEBUG("Premature end of JER SEQUENCE");
                 RETURN(RC_FAIL);
             }
-            /* Fall through */
-        case JCK_KEY:
         case JCK_COMMA:
+            ADVANCE(ch_size);
+            continue;
+            /* Fall through */
+        case JCK_OSTART: /* '{' */
             if(ctx->phase == 0) {
                 JER_ADVANCE(ch_size);
                 ctx->phase = 1;  /* Processing body phase */
@@ -218,8 +198,8 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             }
 
             /* Fall through */
+        case JCK_KEY:
         case JCK_UNKNOWN:
-        case JCK_OSTART:
             ASN_DEBUG("JER/SEQUENCE: scv=%d, ph=%d, edx=%" ASN_PRI_SIZE "",
                       scv, ctx->phase, edx);
             if(ctx->phase != 1) {
@@ -232,26 +212,9 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             }
 
             if(edx < td->elements_count) {
-                JER_ADVANCE(ch_size);
                 /*
                  * We have to check which member is next.
                  */
-                JER_SAVE_STATE;
-                ctx->context = 0;
-
-                ch_size = jer_next_token(&ctx->context, ptr, size, &ch_type);
-                if(ch_size == -1) {
-                    RETURN(RC_FAIL);
-                } 
-
-                if(ch_type != PJER_KEY) {
-                    JER_ADVANCE(ch_size); /* Skip silently */
-                    ch_size = jer_next_token(&ctx->context, ptr, size, &ch_type);
-                    if(ch_size == -1) {
-                        RETURN(RC_FAIL);
-                    } 
-                }
-
                 size_t n;
                 size_t edx_end = edx + elements[edx].optional + 1;
                 if(edx_end > td->elements_count) {
@@ -265,6 +228,24 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                         case JCK_KEY:
                             ctx->step = edx = n;
                             ctx->phase = 2;
+
+                            ADVANCE(ch_size); /* skip key */
+                            /* skip colon */
+                            ch_size = jer_next_token(&ctx->context, ptr, size,
+                                    &ch_type);
+                            if(ch_size == -1) {
+                                RETURN(RC_FAIL);
+                            } else {
+                                switch(ch_type) {
+                                case PJER_WMORE:
+                                    RETURN(RC_WMORE);
+                                case PJER_TEXT:  
+                                    JER_ADVANCE(ch_size);
+                                    break;
+                                default:
+                                    RETURN(RC_FAIL);
+                                }
+                            }
                             break;
                         case JCK_UNKNOWN:
                             continue;
@@ -274,7 +255,6 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                     }
                     break;
                 }
-                JER_RESTORE_STATE;
                 if(n != edx_end) 
                     continue;
             } else {
@@ -299,7 +279,7 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             break;
         }
 
-        ASN_DEBUG("Unexpected XML key in SEQUENCE [%c%c%c%c%c%c]",
+        ASN_DEBUG("Unexpected JSON key in SEQUENCE [%c%c%c%c%c%c]",
                   size>0?((const char *)ptr)[0]:'.',
                   size>1?((const char *)ptr)[1]:'.',
                   size>2?((const char *)ptr)[2]:'.',

@@ -191,7 +191,7 @@ jer_check_sym(const void *buf_ptr, int size, const char *need_key) {
 #define	JER_GOT_BODY(chunk_buf, chunk_size, size)	do {	\
 		ssize_t converted_size = body_receiver		\
 			(struct_key, chunk_buf, chunk_size,	\
-				(size_t)chunk_size < size);	\
+				(size_t)chunk_size <= size);	\
 		if(converted_size == -1) RETURN(RC_FAIL);	\
 		if(converted_size == 0				\
 			&& size == (size_t)chunk_size)		\
@@ -227,13 +227,12 @@ jer_decode_general(const asn_codec_ctx_t *opt_codec_ctx,
 	/*
 	 * Phases of jer/JSON processing:
 	 * Phase 0: Check that the opening key matches our expectations.
-	 * Phase 1: Processing body and reacting on closing key.
+	 * Phase 1: Processing body and reacting on closing token.
 	 */
 	if(ctx->phase > 1) RETURN(RC_FAIL);
 	for(;;) {
 		pjer_chunk_type_e ch_type;	/* jer chunk type */
 		ssize_t ch_size;		/* Chunk size */
-		jer_check_sym_e scv;		/* Symbol check value */
 
 		/*
 		 * Get the next part of the JSON stream.
@@ -260,30 +259,9 @@ jer_decode_general(const asn_codec_ctx_t *opt_codec_ctx,
 			}
 		}
 
-		scv = jer_check_sym(buf_ptr, ch_size, ch_type == PJER_KEY ? json_key : NULL);
-		/*
-		 * Phase 0:
-		 * 	Expecting the opening key
-		 * 	for the type being processed.
-		 * Phase 1:
-		 * 	Waiting for the closing JSON token.
-		 */
-		switch(scv) {
-		case JCK_KEY:
-			if(ctx->phase) break;
-			ADVANCE(ch_size);
-			ctx->phase = 1;	/* Processing body phase */
-			continue;
-		case JCK_OEND:
-		case JCK_AEND:
-		case JCK_COMMA:
-			ctx->phase = 2;	/* Phase out */
-			RETURN(RC_OK);
-		default:
-			break;		/* Unexpected token */
-		}
+        ctx->phase = 2;	/* Phase out */
+        RETURN(RC_OK);
 
-		ASN_DEBUG("Unexpected JSON key (expected \"%s\")", json_key);
 		break;	/* Dark and mysterious things have just happened */
 	}
 

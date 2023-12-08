@@ -39,7 +39,6 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
     const asn_SET_OF_specifics_t *specs = (const asn_SET_OF_specifics_t *)td->specifics;
     const asn_TYPE_member_t *element = td->elements;
     const char *elm_tag;
-    const char *json_key = opt_mname ? opt_mname : td->xml_tag;
 
     /*
      * ... and parts of the structure being constructed.
@@ -74,7 +73,7 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
     /*
      * Phases of JER/JSON processing:
      * Phase 0: Check that the opening tag matches our expectations.
-     * Phase 1: Processing body and reacting on closing tag.
+     * Phase 1: Processing body and reacting on closing token.
      * Phase 2: Processing inner type.
      */
     for(; ctx->phase <= 2;) {
@@ -104,12 +103,6 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                 JER_ADVANCE(tmprval.consumed);
                 RETURN(tmprval.code);
             }
-            JER_ADVANCE(jer_whitespace_span(buf_ptr, size));
-            if(((const char*)buf_ptr)[0] != ']') {
-                ch_size = jer_next_token(&ctx->context, buf_ptr, size,
-                        &ch_type);
-                JER_ADVANCE(ch_size);
-            }
 
             ctx->phase = 1;  /* Back to body processing */
             ASN_DEBUG("JER/SET OF phase => %d", ctx->phase);
@@ -117,7 +110,7 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
         }
 
         /*
-         * Get the next part of the XML stream.
+         * Get the next part of the JSON stream.
          */
         ch_size = jer_next_token(&ctx->context,
                                  buf_ptr, size, &ch_type);
@@ -127,8 +120,8 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             switch(ch_type) {
             case PJER_WMORE:
                 RETURN(RC_WMORE);
-            case PJER_TEXT:  /* Got XML comment */
-                JER_ADVANCE(ch_size);  /* Skip silently */
+            case PJER_TEXT:  
+                JER_ADVANCE(ch_size);
                 continue;
 
             case PJER_DLM:
@@ -138,12 +131,10 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             }
         }
 
-        scv = jer_check_sym(buf_ptr, ch_size, ctx->phase == 0 ? json_key : NULL);
+        scv = jer_check_sym(buf_ptr, ch_size, NULL);
         ASN_DEBUG("JER/SET OF: scv = %d, ph=%d t=%s",
                   scv, ctx->phase, json_key);
         switch(scv) {
-        case JCK_ASTART:
-            continue;
         case JCK_AEND:
             if(ctx->phase == 0) break;
             ctx->phase = 0;
@@ -158,13 +149,10 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             /* Fall through */
         case JCK_KEY:
         case JCK_COMMA:
+
+        case JCK_ASTART:
             if(ctx->phase == 0) {
                 JER_ADVANCE(ch_size);
-                if (scv == JCK_KEY) {
-                    ch_size = jer_next_token(&ctx->context, buf_ptr, size,
-                            &ch_type);
-                    JER_ADVANCE(ch_size);
-                }
                 ctx->phase = 1;  /* Processing body phase */
                 continue;
             }
@@ -238,9 +226,6 @@ SET_OF_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
     const asn_SET_OF_specifics_t *specs = (const asn_SET_OF_specifics_t *)td->specifics;
     const asn_TYPE_member_t *elm = td->elements;
     const asn_anonymous_set_ *list = _A_CSET_FROM_VOID(sptr);
-    const char *mname = specs->as_XMLValueList
-        ? 0 : ((*elm->name) ? elm->name : elm->type->xml_tag);
-    size_t mlen = mname ? strlen(mname) : 0;
     int xcan = 0;
     jer_tmp_enc_t *encs = 0;
     size_t encs_count = 0;
@@ -257,6 +242,7 @@ SET_OF_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
     }
 
     er.encoded = 0;
+    ASN__CALLBACK("[", 1);
 
     for(i = 0; i < list->count; i++) {
         asn_enc_rval_t tmper = {0,0,0};
@@ -270,11 +256,6 @@ SET_OF_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
             encs_count++;
         }
 
-        if(mname) {
-            if(!xcan) ASN__TEXT_INDENT(1, ilevel);
-            ASN__CALLBACK3("\"", 1, mname, mlen, "\": ", 3);
-        }
-
         if(!xcan && specs->as_XMLValueList == 1)
             ASN__TEXT_INDENT(1, ilevel + 1);
         tmper = elm->type->op->jer_encoder(elm->type, memb_ptr,
@@ -285,11 +266,15 @@ SET_OF_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
         if(tmper.encoded == 0 && specs->as_XMLValueList) {
             const char *name = elm->type->xml_tag;
             size_t len = strlen(name);
-            ASN__CALLBACK3("<", 1, name, len, "/>", 2);
+            ASN__CALLBACK3("\"", 1, name, len, "\"", 1);
+        }
+        if (i != list->count - 1) {
+          ASN__CALLBACK(",", 1);
         }
     }
 
     if(!xcan) ASN__TEXT_INDENT(1, ilevel - 1);
+    ASN__CALLBACK("]", 1);
 
     if(encs) {
         jer_tmp_enc_t *enc = encs;

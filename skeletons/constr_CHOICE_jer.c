@@ -26,23 +26,6 @@
         consumed_myself += num;                                   \
     } while(0)
 
-#undef JER_SAVE_STATE
-#define JER_SAVE_STATE                                  \
-    do {                                                \
-        buf_ptr0 = buf_ptr;                             \
-        size0 = size;                                   \
-        consumed_myself0 = consumed_myself;             \
-        context0 = ctx->context;                        \
-    } while(0)
-
-#undef JER_RESTORE_STATE
-#define JER_RESTORE_STATE                               \
-    do {                                                \
-        buf_ptr = buf_ptr0;                             \
-        size = size0;                                   \
-        consumed_myself = consumed_myself0;             \
-        ctx->context = context0;                        \
-    } while(0)
 /*
  * Decode the JER (JSON) data.
  */
@@ -54,7 +37,6 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
      * Bring closer parts of structure description.
      */
     const asn_CHOICE_specifics_t *specs = (const asn_CHOICE_specifics_t *)td->specifics;
-    const char *json_key = opt_mname ? opt_mname : td->xml_tag;
 
     /*
      * Parts of the structure being constructed.
@@ -65,7 +47,6 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
     asn_dec_rval_t rval;          /* Return value of a decoder */
     ssize_t consumed_myself = 0;  /* Consumed bytes from ptr */
     size_t edx;                   /* Element index */
-    int skip_outer = 0;           /* Skip outer layer */
 
     /*
      * Create the target structure if it is not present already.
@@ -79,23 +60,13 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
      * Restore parsing context.
      */
     ctx = (asn_struct_ctx_t *)((char *)st + specs->ctx_offset);
-    if(ctx->phase == 0 && !*json_key) {
-        /* Skip the outer key checking phase */
-        ctx->phase = 1;  
-        skip_outer = 1;
-    }
-
-    const void* buf_ptr0 = buf_ptr;
-    size_t size0 = size;
-    ssize_t consumed_myself0 = consumed_myself;  /* Consumed bytes from ptr */
-    int context0 = ctx->context;
 
     /*
      * Phases of JER/JSON processing:
      * Phase 0: Check that the opening key matches our expectations.
-     * Phase 1: Processing body and reacting on closing key.
+     * Phase 1: Processing body and reacting on closing token.
      * Phase 2: Processing inner type.
-     * Phase 3: Only waiting for closing key.
+     * Phase 3: Only waiting for closing token.
      * Phase 4: Skipping unknown extensions.
      * Phase 5: PHASED OUT
      */
@@ -147,14 +118,8 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             /* Fall through */
         }
 
-        /* No need to wait for closing key; special mode. */
-        if(ctx->phase == 3 && !*json_key) {
-            ctx->phase = 5;  /* Phase out */
-            RETURN(RC_OK);
-        }
-
         /*
-         * Get the next part of the XML stream.
+         * Get the next part of the JSON stream.
          */
         ch_size = jer_next_token(&ctx->context, buf_ptr, size, &ch_type);
         if(ch_size == -1) {
@@ -175,7 +140,7 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             }
         }
 
-        scv = jer_check_sym(buf_ptr, ch_size, ctx->phase == 0 ? json_key : NULL);
+        scv = jer_check_sym(buf_ptr, ch_size, NULL);
         ASN_DEBUG("JER/CHOICE checked [%c%c%c%c] vs [%s], scv=%d",
                   ch_size>0?((const uint8_t *)buf_ptr)[0]:'?',
                   ch_size>1?((const uint8_t *)buf_ptr)[1]:'?',
@@ -210,41 +175,22 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             JER_ADVANCE(ch_size);
             ctx->phase = 5;  /* Phase out */
             RETURN(RC_OK);
-        case JCK_KEY:
+
         case JCK_COMMA:
+            JER_ADVANCE(ch_size);
+            continue;
+
+        case JCK_OSTART:
             if(ctx->phase == 0) {
                 JER_ADVANCE(ch_size);
                 ctx->phase = 1;  /* Processing body phase */
                 continue;
             }
-            /* Fall through */
+        case JCK_KEY:
         case JCK_UNKNOWN:
-        case JCK_OSTART:
 
             if(ctx->phase != 1)
                 break;  /* Really unexpected */
-
-            if (!skip_outer) {
-                JER_ADVANCE(ch_size); /* Skip silently */
-
-                // Save state
-                JER_SAVE_STATE; /* We have to look inside the object to see which 
-                               * key (choice) is present */
-                ctx->context = 0;
-
-                ch_size = jer_next_token(&ctx->context, buf_ptr, size, &ch_type);
-                if(ch_size == -1) {
-                    RETURN(RC_FAIL);
-                } 
-
-                if (ch_type != PJER_KEY) {
-                    JER_ADVANCE(ch_size); /* Skip silently */
-                    ch_size = jer_next_token(&ctx->context, buf_ptr, size, &ch_type);
-                    if(ch_size == -1) {
-                        RETURN(RC_FAIL);
-                    } 
-                }
-            }
 
             /*
              * Search which inner member corresponds to this key.
@@ -259,6 +205,23 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                      */
                     ctx->step = edx;
                     ctx->phase = 2;
+                    JER_ADVANCE(ch_size); /* skip key */
+                    /* skip colon */
+                    ch_size = jer_next_token(&ctx->context, buf_ptr, size,
+                            &ch_type);
+                    if(ch_size == -1) {
+                        RETURN(RC_FAIL);
+                    } else {
+                        switch(ch_type) {
+                        case PJER_WMORE:
+                            RETURN(RC_WMORE);
+                        case PJER_TEXT:  
+                            JER_ADVANCE(ch_size);
+                            break;
+                        default:
+                            RETURN(RC_FAIL);
+                        }
+                    }
                     break;
                 case JCK_UNKNOWN:
                     continue;
@@ -267,9 +230,6 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                     break;  /* Phase out */
                 }
                 break;
-            }
-            if (!skip_outer) {
-                JER_RESTORE_STATE;
             }
             if(edx != td->elements_count)
                 continue;
@@ -346,7 +306,6 @@ CHOICE_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
         er.encoded += tmper.encoded;
 
         ASN__CALLBACK("}", 1);
-        //        ASN__CALLBACK3("</", 2, mname, mlen, ">", 1);
     }
 
     ASN__ENCODED_OK(er);
