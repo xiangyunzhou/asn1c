@@ -29,6 +29,7 @@ RELATIVE_OID__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
             break;
         }
     }
+    --chunk_end;
     for (; chunk_end >= p; --chunk_end) {
         if (*chunk_end == CQUOTE) 
             break;
