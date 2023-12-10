@@ -65,20 +65,23 @@ OPEN_TYPE_jer_get(const asn_codec_ctx_t *opt_codec_ctx,
             case PJER_WMORE:
                 ASN__DECODE_STARVED;
             case PJER_TEXT:
+            case PJER_DLM:
                 ADVANCE(ch_size);
                 continue;
+            case PJER_KEY:
             default:
                 break;
             }
             break;
         }
+
     }
 
     /*
      * Wrapper value confirmed.
      */
-    switch(jer_check_sym(ptr, ch_size, elm->name)) {
-    case JCK_KEY:
+    switch(jer_check_sym(ptr, ch_size, NULL)) {
+    case JCK_UNKNOWN:
         ADVANCE(ch_size);
         break;
     case JCK_BROKEN:
@@ -86,9 +89,10 @@ OPEN_TYPE_jer_get(const asn_codec_ctx_t *opt_codec_ctx,
         ASN__DECODE_FAILED;
     }
 
+
     /* Skip colon */
     ch_size = jer_next_token(&jer_context, ptr, size, &ch_type);
-    if(ch_size < 0 || ch_type != PJER_DLM)  {
+    if(ch_size < 0 || ch_type != PJER_TEXT)  {
         ASN__DECODE_FAILED;
     } else {
         ADVANCE(ch_size);

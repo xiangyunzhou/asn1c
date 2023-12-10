@@ -15,23 +15,13 @@ jer_encode(const asn_TYPE_descriptor_t *td, const void *sptr,
            void *app_key) {
     asn_enc_rval_t er = {0, 0, 0};
 	asn_enc_rval_t tmper;
-	const char *mname;
-	size_t mlen;
 
 	if(!td || !sptr) goto cb_failed;
 
-	mname = td->xml_tag;
-	mlen = strlen(mname);
-
-	ASN__CALLBACK3("{\n\"", 3, mname, mlen, "\":", 2);
-
-        int xFlag = 0;
-	tmper = td->op->jer_encoder(td, sptr, 1, xFlag, cb, app_key);
+    int xFail = 1; /* TODO JER flags */
+	tmper = td->op->jer_encoder(td, sptr, 1, xFail, cb, app_key);
 	if(tmper.encoded == -1) return tmper;
 	er.encoded += tmper.encoded;
-
-        ASN__CALLBACK("}", 1);
-        //	ASN__CALLBACK3("</", 2, mname, mlen, ">\n", xcan);
 
 	ASN__ENCODED_OK(er);
 cb_failed:

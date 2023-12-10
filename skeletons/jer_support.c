@@ -84,6 +84,8 @@ pjson_parse(int *stateContext, const void *jsonbuf, size_t size,
     const char *end = p + size;
 
     int include = 0;
+    int in_string = 0;
+    int escaped = 0;
 
     for(; p < end; p++) {
         int C = *(const unsigned char *)p;
@@ -93,27 +95,44 @@ pjson_parse(int *stateContext, const void *jsonbuf, size_t size,
              * Initial state: we're in the middle of some text,
              * or just have started.
              */
-            switch(C) {
-            case LCBRAC:
-                /* We're now in an object */
-                state = ST_KEY;
+
+            if(C == CQUOTE && !escaped) { /* " */
+                in_string = !in_string;
                 break;
-            case CQUOTE:
-                TOKEN_CB(PJSON_TEXT, ST_KEY_BODY, 0);
-                break;
-            case RSBRAC:
-                include = !(p - chunk_start);
-                TOKEN_CB_FINAL(PJSON_VALUE, ST_TEXT, include);
-                break;
-            case RCBRAC:
-                include = !(p - chunk_start);
-                TOKEN_CB_FINAL(PJSON_VALUE, ST_TEXT, include);
-                break;
-            case CCOMMA:
-                TOKEN_CB_FINAL(PJSON_VALUE, ST_TEXT, 0);
-                break;
-            default:
-                break;
+            } else {
+                if (C == '\\') {
+                    escaped = !escaped;
+                    break;
+                } else {
+                    escaped = 0;
+                }
+            }
+
+            if (!in_string) {
+                switch(C) {
+                case LCBRAC:
+                    /* We're now in an object */
+                    TOKEN_CB(PJSON_DLM, ST_KEY, 1);
+                    break;
+                case LSBRAC:
+                    /* We're now in an array */
+                    TOKEN_CB(PJSON_DLM, ST_ARRAY_VALUE, 1);
+                    break;
+
+                case RSBRAC:
+                    include = !(p - chunk_start);
+                    TOKEN_CB_FINAL(PJSON_VALUE, ST_TEXT, include);
+                    break;
+                case RCBRAC:
+                    include = !(p - chunk_start);
+                    TOKEN_CB_FINAL(PJSON_VALUE, ST_TEXT, include);
+                    break;
+                case CCOMMA:
+                    TOKEN_CB_FINAL(PJSON_VALUE, ST_TEXT, 0);
+                    break;
+                default:
+                    break;
+                }
             }
             break;
 
@@ -155,14 +174,8 @@ pjson_parse(int *stateContext, const void *jsonbuf, size_t size,
                 break;
             } else {
                 switch(C) {
-                case LCBRAC:
-                    TOKEN_CB(PJSON_DLM, ST_VALUE, 1);
-                    break;
                 case CCOMMA:
-                    TOKEN_CB(PJSON_DLM, ST_VALUE, 1);
-                    break;
-                case LSBRAC:
-                    TOKEN_CB(PJSON_DLM, ST_ARRAY_VALUE, 1);
+                    TOKEN_CB(PJSON_DLM, ST_KEY, 1);
                     break;
                 case RCBRAC:
                     TOKEN_CB(PJSON_DLM, ST_END, 1);
@@ -184,7 +197,7 @@ pjson_parse(int *stateContext, const void *jsonbuf, size_t size,
                 break;
             case CCOMMA:
                 include = !(p - chunk_start);
-                TOKEN_CB_FINAL(PJSON_VALUE, ST_VALUE, include);
+                TOKEN_CB_FINAL(PJSON_VALUE, ST_KEY, include);
                 break;
             default:
                 break;
@@ -217,17 +230,17 @@ pjson_parse(int *stateContext, const void *jsonbuf, size_t size,
 
         case ST_ARRAY_VALUE_BODY: /* Inside array value */
             switch(C)  {
-            case RCBRAC:
-                include = !(p - chunk_start);
-                TOKEN_CB_FINAL(PJSON_VALUE, ST_ARRAY_VALUE, include);
-                break;
             case RSBRAC:
                 include = !(p - chunk_start);
-                TOKEN_CB_FINAL(PJSON_VALUE, ST_ARRAY_VALUE, include);
+                TOKEN_CB_FINAL(PJSON_VALUE, ST_TEXT, include);
                 break;
             case CCOMMA:
                 include = !(p - chunk_start);
-                TOKEN_CB_FINAL(PJSON_VALUE, ST_ARRAY_VALUE, include);
+                if (!include) {
+                    TOKEN_CB_FINAL(PJSON_VALUE, ST_ARRAY_VALUE, 0);
+                } else {
+                    TOKEN_CB(PJSON_DLM, ST_ARRAY_VALUE, 0);
+                }
                 break;
             default:
                 break;
@@ -252,7 +265,7 @@ pjson_parse(int *stateContext, const void *jsonbuf, size_t size,
     if(p - chunk_start) {
         switch (state) {
         case ST_TEXT:
-            TOKEN_CB(PJSON_TEXT, state, 0);
+            TOKEN_CB_FINAL(PJSON_VALUE, state, 0);
             break;
         default:
             break;

@@ -54,52 +54,60 @@ static const struct OCTET_STRING__jer_escape_table_s {
     int size;
 } OCTET_STRING__jer_escape_table[] = {
 #define	OSXET(s)	{ s, sizeof(s) - 1 }
-    OSXET("\074\156\165\154\057\076"),  /* <nul/> */
-    OSXET("\074\163\157\150\057\076"),  /* <soh/> */
-    OSXET("\074\163\164\170\057\076"),  /* <stx/> */
-    OSXET("\074\145\164\170\057\076"),  /* <etx/> */
-    OSXET("\074\145\157\164\057\076"),  /* <eot/> */
-    OSXET("\074\145\156\161\057\076"),  /* <enq/> */
-    OSXET("\074\141\143\153\057\076"),  /* <ack/> */
-    OSXET("\074\142\145\154\057\076"),  /* <bel/> */
-    OSXET("\074\142\163\057\076"),      /* <bs/> */
-    OSXET("\011"),                      /* \t */
-    OSXET("\012"),                      /* \n */
-    OSXET("\074\166\164\057\076"),      /* <vt/> */
-    OSXET("\074\146\146\057\076"),      /* <ff/> */
-    OSXET("\015"),                      /* \r */
-    OSXET("\074\163\157\057\076"),      /* <so/> */
-    OSXET("\074\163\151\057\076"),      /* <si/> */
-    OSXET("\074\144\154\145\057\076"),  /* <dle/> */
-    OSXET("\074\144\143\061\057\076"),  /* <de1/> */
-    OSXET("\074\144\143\062\057\076"),  /* <de2/> */
-    OSXET("\074\144\143\063\057\076"),  /* <de3/> */
-    OSXET("\074\144\143\064\057\076"),  /* <de4/> */
-    OSXET("\074\156\141\153\057\076"),  /* <nak/> */
-    OSXET("\074\163\171\156\057\076"),  /* <syn/> */
-    OSXET("\074\145\164\142\057\076"),  /* <etb/> */
-    OSXET("\074\143\141\156\057\076"),  /* <can/> */
-    OSXET("\074\145\155\057\076"),      /* <em/> */
-    OSXET("\074\163\165\142\057\076"),  /* <sub/> */
-    OSXET("\074\145\163\143\057\076"),  /* <esc/> */
-    OSXET("\074\151\163\064\057\076"),  /* <is4/> */
-    OSXET("\074\151\163\063\057\076"),  /* <is3/> */
-    OSXET("\074\151\163\062\057\076"),  /* <is2/> */
-    OSXET("\074\151\163\061\057\076"),  /* <is1/> */
+    { 0, 0 },  /* NULL */
+    { 0, 0 },  /* Start of header */
+    { 0, 0 },  /* Start of text */
+    { 0, 0 },  /* End of text */
+    { 0, 0 },  /* End of transmission */
+    { 0, 0 },  /* Enquiry */
+    { 0, 0 },  /* Ack */
+    { 0, 0 },  /* Bell */
+    OSXET("\134\142"),  /* \b */
+    OSXET("\134\164"),  /* \t */
+    OSXET("\134\156"),  /* \n */
+    { 0, 0 },  /* Vertical tab */
+    OSXET("\134\146"),  /* \f */
+    OSXET("\134\162"),  /* \r */
+    { 0, 0 },  /* Shift out */
+    { 0, 0 },  /* Shift in */
+    { 0, 0 },  /* Data link escape */
+    { 0, 0 },  /* Device control 1 */
+    { 0, 0 },  /* Device control 2 */
+    { 0, 0 },  /* Device control 3 */
+    { 0, 0 },  /* Device control 4 */
+    { 0, 0 },  /* Negative ack */
+    { 0, 0 },  /* Synchronous idle */
+    { 0, 0 },  /* End of transmission block */
+    { 0, 0 },  /* Cancel */
+    { 0, 0 },  /* End of medium */
+    { 0, 0 },  /* Substitute */
+    { 0, 0 },  /* Escape */
+    { 0, 0 },  /* File separator */
+    { 0, 0 },  /* Group separator */
+    { 0, 0 },  /* Record separator */
+    { 0, 0 },  /* Unit separator */
     { 0, 0 },                           /* " " */
     { 0, 0 },                           /* ! */
-    { 0, 0 },                           /* \" */
+    OSXET("\134\042"),                  /* \" */
     { 0, 0 },                           /* # */
     { 0, 0 },                           /* $ */
     { 0, 0 },                           /* % */
-    OSXET("\046\141\155\160\073"),      /* &amp; */
+    { 0, 0 },  /* &amp; */
     { 0, 0 },                           /* ' */
     {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},  /* ()*+,-./ */
     {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},  /* 01234567 */
     {0,0},{0,0},{0,0},{0,0},            /* 89:; */
-    OSXET("\046\154\164\073"),          /* &lt; */
+    { 0, 0 },  /* &lt; */
     { 0, 0 },                           /* = */
-    OSXET("\046\147\164\073"),          /* &gt; */
+    { 0, 0 },  /* &gt; */
+    { 0, 0 },  /* ? */
+    { 0, 0 },  /* @ */
+    {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}, /* ABCDEFGH */
+    {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}, /* IJKLMNOP */
+    {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}, /* QRSTUVWX */
+    {0,0},{0,0},                                     /* YZ */
+    { 0, 0 },  /* [ */
+    OSXET("\134\134"),  /* \\ */
 };
 
 static int
@@ -166,7 +174,7 @@ OCTET_STRING_encode_jer_utf8(const asn_TYPE_descriptor_t *td, const void *sptr,
         int s_len;	/* Special encoding sequence length */
 
         /*
-         * Escape certain characters: X.680/11.15
+         * Escape certain characters
          */
         if(ch < sizeof(OCTET_STRING__jer_escape_table)
             / sizeof(OCTET_STRING__jer_escape_table[0])
@@ -213,6 +221,7 @@ static ssize_t OCTET_STRING__convert_hexadecimal(void *sptr, const void *chunk_b
             break;
         }
     }
+    --pend;
     for (; pend >= p; --pend) {
         if (*pend == CQUOTE) 
             break;
@@ -269,7 +278,7 @@ static ssize_t OCTET_STRING__convert_hexadecimal(void *sptr, const void *chunk_b
         if(have_more) {
             /*
              * Partial specification is fine,
-             * because no more more PXER_TEXT data is available.
+             * because no more more PJER_TEXT data is available.
              */
             *buf++ = clv << 4;
             chunk_stop = p;
@@ -329,7 +338,7 @@ OS__strtoent(int base, const char *buf, const char *end, int32_t *ret_value) {
 }
 
 /*
- * Convert from the plain UTF-8 format, expanding entity references: "2 &lt; 3"
+ * Convert from the plain UTF-8 format
  */
 static ssize_t
 OCTET_STRING__convert_entrefs(void *sptr, const void *chunk_buf,
@@ -346,6 +355,7 @@ OCTET_STRING__convert_entrefs(void *sptr, const void *chunk_buf,
             break;
         }
     }
+    --pend;
     for(; pend >= p; --pend) {
         if (*pend == CQUOTE) 
             break;
@@ -367,7 +377,7 @@ OCTET_STRING__convert_entrefs(void *sptr, const void *chunk_buf,
         int ch = *(const unsigned char *)p;
         int len;  /* Length of the rest of the chunk */
 
-        if(ch != 0x26 /* '&' */) {
+        if(ch != 0x5c /* '\' */) {
             *buf++ = ch;
             continue;  /* That was easy... */
         }
@@ -376,8 +386,10 @@ OCTET_STRING__convert_entrefs(void *sptr, const void *chunk_buf,
          * Process entity reference.
          */
         len = chunk_size - (p - (const char *)chunk_buf);
-        if(len == 1 /* "&" */) goto want_more;
-        if(p[1] == 0x23 /* '#' */) {
+        if(len == 1 /* "\" */) goto want_more;
+        switch(p[1]) {
+        case 0x75: /* 'u' */
+            ;
             const char *pval;  /* Pointer to start of digits */
             int32_t val = 0;  /* Entity reference value */
             int base;
@@ -425,43 +437,41 @@ OCTET_STRING__convert_entrefs(void *sptr, const void *chunk_buf,
                 *buf++ = 0x80 | ((val >> 6) & 0x3f);
                 *buf++ = 0x80 | ((val & 0x3f));
             }
-        } else {
-            /*
-             * Ugly, limited parsing of &amp; &gt; &lt;
-             */
-            char *sc = (char *)memchr(p, 0x3b, len > 5 ? 5 : len);
-            if(!sc) goto want_more;
-            if((sc - p) == 4
-                && p[1] == 0x61  /* 'a' */
-                && p[2] == 0x6d  /* 'm' */
-                && p[3] == 0x70  /* 'p' */) {
-                *buf++ = 0x26;
-                p = sc;
-                continue;
-            }
-            if((sc - p) == 3) {
-                if(p[1] == 0x6c) {
-                    *buf = 0x3c;  /* '<' */
-                } else if(p[1] == 0x67) {
-                    *buf = 0x3e;  /* '>' */
-                } else {
-                    /* Unsupported entity reference */
-                    *buf++ = ch;
-                    continue;
-                }
-                if(p[2] != 0x74) {
-                    /* Unsupported entity reference */
-                    *buf++ = ch;
-                    continue;
-                }
-                buf++;
-                p = sc;
-                continue;
-            }
+            break;
+        case 0x22: /* " */
+            *buf++ = 0x22;
+            ++p;
+            break;
+        case 0x5c: /* \ */
+            *buf++ = 0x5c;
+            ++p;
+            break;
+        case 0x62: /* b */
+            *buf++ = 0x08;
+            ++p;
+            break;
+        case 0x66: /* f */
+            *buf++ = 0x0c;
+            ++p;
+            break;
+        case 0x6e: /* n */
+            *buf++ = 0x0a;
+            ++p;
+            break;
+        case 0x72: /* r */
+            *buf++ = 0x0d;
+            ++p;
+            break;
+        case 0x74: /* t */
+            *buf++ = 0x09;
+            ++p;
+            break;
+        default:
             /* Unsupported entity reference */
             *buf++ = ch;
+            ++p;
+            continue;
         }
-
         continue;
     want_more:
         if(have_more) {
@@ -485,7 +495,7 @@ OCTET_STRING__convert_entrefs(void *sptr, const void *chunk_buf,
 }
 
 /*
- * Decode OCTET STRING from the XML element's body.
+ * Decode OCTET STRING from the JSON element's value.
  */
 static asn_dec_rval_t
 OCTET_STRING__decode_jer(

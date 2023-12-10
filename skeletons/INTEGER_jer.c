@@ -13,10 +13,6 @@ struct je2v_key {
     const unsigned int *evmap;
 };
 
-/*
-* Some static functions here are equivalent to XER's.
-* Should be joined in the future.
-*/
 static int
 INTEGER_jer_st_prealloc(INTEGER_t *st, int min_size) {
     void *p = MALLOC(min_size + 1);

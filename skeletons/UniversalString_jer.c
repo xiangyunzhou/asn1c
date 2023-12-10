@@ -71,6 +71,7 @@ UniversalString_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
                            asn_app_consume_bytes_f *cb, void *app_key) {
     const UniversalString_t *st = (const UniversalString_t *)sptr;
     asn_enc_rval_t er = {0,0,0};
+    ssize_t ro_encoded = 0;
 
     (void)ilevel;
     (void)flags;
@@ -78,8 +79,12 @@ UniversalString_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
     if(!st || !st->buf)
         ASN__ENCODE_FAILED;
 
-    er.encoded = UniversalString__dump(st, cb, app_key);
-    if(er.encoded < 0) ASN__ENCODE_FAILED;
+    ASN__CALLBACK("\"", 1);
+    ro_encoded = UniversalString__dump(st, cb, app_key);
+    if(ro_encoded < 0) goto cb_failed;
+    er.encoded += ro_encoded;
+    ASN__CALLBACK("\"", 1);
 
+cb_failed:
     ASN__ENCODED_OK(er);
 }
