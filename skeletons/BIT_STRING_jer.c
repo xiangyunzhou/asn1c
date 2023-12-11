@@ -52,7 +52,6 @@ BIT_STRING_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
     }
     *p++ = '"';
     ASN__CALLBACK(scratch, p - scratch);
-    ASN__TEXT_INDENT(1, ilevel - 1);
 
     ASN__ENCODED_OK(er);
 cb_failed:
