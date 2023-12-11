@@ -19,7 +19,7 @@ jer_encode(const asn_TYPE_descriptor_t *td, const void *sptr,
 	if(!td || !sptr) goto cb_failed;
 
     int xFail = 1; /* TODO JER flags */
-	tmper = td->op->jer_encoder(td, sptr, 1, xFail, cb, app_key);
+	tmper = td->op->jer_encoder(td, sptr, 0, xFail, cb, app_key);
 	if(tmper.encoded == -1) return tmper;
 	er.encoded += tmper.encoded;
 

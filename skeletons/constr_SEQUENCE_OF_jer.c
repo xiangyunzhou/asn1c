@@ -28,6 +28,7 @@ SEQUENCE_OF_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
         void *memb_ptr = list->array[i];
         if(!memb_ptr) continue;
 
+        if(!xcan) ASN__TEXT_INDENT(1, ilevel + 1);
         tmper = elm->type->op->jer_encoder(elm->type, memb_ptr, ilevel + 1,
                                            flags, cb, app_key);
         if(tmper.encoded == -1) return tmper;
@@ -44,7 +45,7 @@ SEQUENCE_OF_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
         }
     }
 
-    if(!xcan) ASN__TEXT_INDENT(1, ilevel - 1);
+    if(!xcan) ASN__TEXT_INDENT(1, ilevel);
     ASN__CALLBACK("]", 1);
 
     ASN__ENCODED_OK(er);
