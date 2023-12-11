@@ -256,8 +256,7 @@ SET_OF_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
             encs_count++;
         }
 
-        if(!xcan && specs->as_XMLValueList == 1)
-            ASN__TEXT_INDENT(1, ilevel + 1);
+        ASN__TEXT_INDENT(1, ilevel + 1);
         tmper = elm->type->op->jer_encoder(elm->type, memb_ptr,
                                            ilevel + (specs->as_XMLValueList != 2),
                                            flags, cb, app_key);
@@ -273,7 +272,7 @@ SET_OF_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
         }
     }
 
-    if(!xcan) ASN__TEXT_INDENT(1, ilevel - 1);
+    if(!xcan) ASN__TEXT_INDENT(1, ilevel);
     ASN__CALLBACK("]", 1);
 
     if(encs) {

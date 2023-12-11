@@ -270,6 +270,7 @@ CHOICE_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
         (const asn_CHOICE_specifics_t *)td->specifics;
     asn_enc_rval_t er = {0,0,0};
     unsigned present = 0;
+    int xcan = 0;
 
     if(!sptr)
         ASN__ENCODE_FAILED;
@@ -298,13 +299,16 @@ CHOICE_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
 
         er.encoded = 0;
 
-        ASN__CALLBACK3("{\n\"", 3, mname, mlen, "\": ", 2);
+        ASN__CALLBACK("{",1);
+        if(!xcan) ASN__TEXT_INDENT(1, ilevel + 1);
+        ASN__CALLBACK3("\"", 1, mname, mlen, "\": ", 3);
 
         tmper = elm->type->op->jer_encoder(elm->type, memb_ptr,
                                            ilevel + 1, flags, cb, app_key);
         if(tmper.encoded == -1) return tmper;
         er.encoded += tmper.encoded;
 
+        if(!xcan) ASN__TEXT_INDENT(1, ilevel);
         ASN__CALLBACK("}", 1);
     }
 
