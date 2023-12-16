@@ -68,12 +68,13 @@ void
 SEQUENCE_free(const asn_TYPE_descriptor_t *td, void *sptr,
               enum asn_struct_free_method method) {
     size_t edx;
-    const asn_SEQUENCE_specifics_t *specs =
-        (const asn_SEQUENCE_specifics_t *)td->specifics;
+    const asn_SEQUENCE_specifics_t *specs; 
     asn_struct_ctx_t *ctx; /* Decoder context */
 
 	if(!td || !sptr)
 		return;
+
+    specs = (const asn_SEQUENCE_specifics_t *)td->specifics;
 
 	ASN_DEBUG("Freeing %s as SEQUENCE", td->name);
 
