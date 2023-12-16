@@ -33,22 +33,6 @@
         consumed_myself += num;           \
     } while(0)
 
-#define JER_SAVE_STATE                        \
-    do {                                      \
-        ptr0 = ptr;                           \
-        size0 = size;                         \
-        consumed_myself0 = consumed_myself;   \
-        context0 = ctx->context;\
-    } while(0)
-
-#define JER_RESTORE_STATE                     \
-    do {                                      \
-        ptr = ptr0;                           \
-        size = size0;                         \
-        consumed_myself = consumed_myself0;   \
-        ctx->context = context0;        \
-    } while(0)
-
 /*
  * Decode the JER (JSON) data.
  */
@@ -62,7 +46,6 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
     const asn_SET_specifics_t *specs
         = (const asn_SET_specifics_t *)td->specifics;
     asn_TYPE_member_t *elements = td->elements;
-    const char *json_key = opt_mname ? opt_mname : td->xml_tag;
 
     /*
      * ... and parts of the structure being constructed.
@@ -72,7 +55,7 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
 
     asn_dec_rval_t rval;          /* Return value from a decoder */
     ssize_t consumed_myself = 0;  /* Consumed bytes from ptr */
-    ssize_t edx = -1;                   /* Element index */
+    ssize_t edx;                  /* Element index */
 
     /*
      * Create the target structure if it is not present already.
@@ -87,12 +70,6 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
      */
     ctx = (asn_struct_ctx_t *)((char *)st + specs->ctx_offset);
 
-    asn_dec_rval_t tmprval = {0};
-    /* Restore vars */
-    const void* ptr0 = ptr;
-    size_t size0 = size;
-    ssize_t consumed_myself0 = consumed_myself;  /* Consumed bytes from ptr */
-    int context0 = ctx->context;
 
     /*
      * Phases of JER/JSON processing:
@@ -113,10 +90,18 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
          * Go inside the inner member of a sequence.
          */
         if(ctx->phase == 2) {
+            asn_dec_rval_t tmprval;
             void *memb_ptr_dontuse;  /* Pointer to the member */
             void **memb_ptr2;        /* Pointer to that pointer */
 
-            elm = &td->elements[edx];
+            if(ASN_SET_ISPRESENT2((char *)st + specs->pres_offset,
+                                  edx)) {
+                ASN_DEBUG("SET %s: Duplicate element %s (%" ASN_PRI_SSIZE ")",
+                          td->name, elements[edx].name, edx);
+                RETURN(RC_FAIL);
+            }
+
+            elm = &elements[edx];
             if(elm->flags & ATF_POINTER) {
                 /* Member is a pointer to another structure */
                 memb_ptr2 = (void **)((char *)st + elm->memb_offset);
@@ -125,21 +110,16 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                 memb_ptr2 = &memb_ptr_dontuse;  /* Only use of memb_ptr_dontuse */
             }
 
-            if(elm->flags & ATF_OPEN_TYPE) {
-                //tmprval = OPEN_TYPE_xer_get(opt_codec_ctx, td, st, elm, ptr, size);
-            } else {
-                /* Invoke the inner type decoder, m.b. multiple times */
-                tmprval = elm->type->op->jer_decoder(opt_codec_ctx,
-                                                     elm->type, memb_ptr2, elm->name,
-                                                     ptr, size);
-            }
+            /* Invoke the inner type decoder, m.b. multiple times */
+            tmprval = elm->type->op->jer_decoder(opt_codec_ctx,
+                                                 elm->type, memb_ptr2, elm->name,
+                                                 ptr, size);
             JER_ADVANCE(tmprval.consumed);
             if(tmprval.code != RC_OK)
                 RETURN(tmprval.code);
             ctx->phase = 1;  /* Back to body processing */
-            ctx->step = ++edx;
-            ASN_DEBUG("JER/SEQUENCE phase => %d, step => %d",
-                ctx->phase, ctx->step);
+            ASN_SET_MKPRESENT((char *)st + specs->pres_offset, edx);
+            ASN_DEBUG("JER/SET phase => %d", ctx->phase);
             /* Fall through */
         }
 
@@ -166,8 +146,8 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             }
         }
 
-        scv = jer_check_sym(ptr, ch_size, ctx->phase == 0 ? json_key : NULL);
-        ASN_DEBUG("JER/SEQUENCE: scv = %d, ph=%d [%s]",
+        scv = jer_check_sym(ptr, ch_size, NULL);
+        ASN_DEBUG("JER/SET: scv = %d, ph=%d [%s]",
                   scv, ctx->phase, json_key);
 
 
@@ -194,10 +174,22 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
         case JCK_OEND:
             if(ctx->phase == 0) break;
             ctx->phase = 0;
-            /* Fall through */
 
-        case JCK_KEY:
+            if(_SET_is_populated(td, st)) {
+                JER_ADVANCE(ch_size);
+                JER_ADVANCE(jer_whitespace_span(ptr, size)); 
+                ctx->phase = 4;  /* Phase out */
+                RETURN(RC_OK);
+            } else {
+                ASN_DEBUG("Premature end of JER SET");
+                RETURN(RC_FAIL);
+            }
+
         case JCK_COMMA:
+            JER_ADVANCE(ch_size);
+            continue;
+
+        case JCK_OSTART:
             if(ctx->phase == 0) {
                 JER_ADVANCE(ch_size);
                 ctx->phase = 1;  /* Processing body phase */
@@ -205,9 +197,9 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             }
 
             /* Fall through */
+        case JCK_KEY:
         case JCK_UNKNOWN:
-        case JCK_OSTART:
-            ASN_DEBUG("JER/SEQUENCE: scv=%d, ph=%d, edx=%" ASN_PRI_SIZE "",
+            ASN_DEBUG("JER/SET: scv=%d, ph=%d, edx=%" ASN_PRI_SIZE "",
                       scv, ctx->phase, edx);
             if(ctx->phase != 1) {
                 break;  /* Really unexpected */
@@ -219,50 +211,44 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             }
 
             if(edx < td->elements_count) {
-                JER_ADVANCE(ch_size);
                 /*
                  * We have to check which member is next.
                  */
-                JER_SAVE_STATE;
-                ctx->context = 0;
-
-                ch_size = jer_next_token(&ctx->context, ptr, size, &ch_type);
-                if(ch_size == -1) {
-                    RETURN(RC_FAIL);
-                } 
-
-                if(ch_type != PJER_KEY) {
-                    JER_ADVANCE(ch_size); /* Skip silently */
-                    ch_size = jer_next_token(&ctx->context, ptr, size, &ch_type);
-                    if(ch_size == -1) {
-                        RETURN(RC_FAIL);
-                    } 
-                }
-
-                size_t n;
-                size_t edx_end = edx + elements[edx].optional + 1;
-                if(edx_end > td->elements_count) {
-                    edx_end = td->elements_count;
-                }
-
-                for(n = edx; n < edx_end; n++) {
-                    elm = &td->elements[n];
+                for(edx = 0; edx < td->elements_count; edx++) {
+                    elm = &elements[edx];
                     scv = jer_check_sym(ptr, ch_size, elm->name);
                     switch (scv) {
-                        case JCK_KEY:
-                            ctx->step = edx = n;
-                            ctx->phase = 2;
-                            break;
-                        case JCK_UNKNOWN:
-                            continue;
-                        default:
-                            n = edx_end;
-                            break; /* Phase out */
+                    case JCK_KEY:
+                        ctx->step = edx;
+                        ctx->phase = 2;
+
+                        JER_ADVANCE(ch_size); /* skip key */
+                        /* skip colon */
+                        ch_size = jer_next_token(&ctx->context, ptr, size,
+                                &ch_type);
+                        if(ch_size == -1) {
+                            RETURN(RC_FAIL);
+                        } else {
+                            switch(ch_type) {
+                                case PJER_WMORE:
+                                    RETURN(RC_WMORE);
+                                case PJER_TEXT:  
+                                    JER_ADVANCE(ch_size);
+                                    break;
+                                default:
+                                    RETURN(RC_FAIL);
+                            }
+                        }
+                        break;
+                    case JCK_UNKNOWN:
+                        continue;
+                    default:
+                        edx = td->elements_count;
+                        break; /* Phase out */
                     }
                     break;
                 }
-                JER_RESTORE_STATE;
-                if(n != edx_end) 
+                if(edx != td->elements_count)
                     continue;
             } else {
                 ASN_DEBUG("Out of defined members: %" ASN_PRI_SIZE "/%u",
@@ -283,7 +269,7 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             break;
         }
 
-        ASN_DEBUG("Unexpected JSON key in SEQUENCE [%c%c%c%c%c%c]",
+        ASN_DEBUG("Unexpected JSON key in SET [%c%c%c%c%c%c]",
                   size>0?((const char *)ptr)[0]:'.',
                   size>1?((const char *)ptr)[1]:'.',
                   size>2?((const char *)ptr)[2]:'.',
@@ -295,66 +281,4 @@ SET_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
 
     ctx->phase = 4;  /* "Phase out" on hard failure */
     RETURN(RC_FAIL);
-}
-
-
-asn_enc_rval_t
-SET_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
-               enum jer_encoder_flags_e flags, asn_app_consume_bytes_f *cb,
-               void *app_key) {
-    const asn_SET_specifics_t *specs = (const asn_SET_specifics_t *)td->specifics;
-    asn_enc_rval_t er;
-    int xcan = 0;
-    const asn_TYPE_tag2member_t *t2m = specs->tag2el_cxer;
-    size_t t2m_count = specs->tag2el_cxer_count;
-    size_t edx;
-
-    if(!sptr)
-        ASN__ENCODE_FAILED;
-
-    assert(t2m_count == td->elements_count);
-
-    er.encoded = 0;
-
-    for(edx = 0; edx < t2m_count; edx++) {
-        asn_enc_rval_t tmper;
-        asn_TYPE_member_t *elm;
-        const void *memb_ptr;
-        const char *mname;
-        size_t mlen;
-
-        elm = &td->elements[t2m[edx].el_no];
-        mname = elm->name;
-        mlen = strlen(elm->name);
-
-        if(elm->flags & ATF_POINTER) {
-            memb_ptr =
-                *(const void *const *)((const char *)sptr + elm->memb_offset);
-            if(!memb_ptr) {
-                if(elm->optional)
-                    continue;
-                /* Mandatory element missing */
-                ASN__ENCODE_FAILED;
-            }
-        } else {
-            memb_ptr = (const void *)((const char *)sptr + elm->memb_offset);
-        }
-
-        if(!xcan)
-            ASN__TEXT_INDENT(1, ilevel);
-        ASN__CALLBACK3("\"", 1, mname, mlen, "\"", 1);
-
-        /* Print the member itself */
-        tmper = elm->type->op->jer_encoder(elm->type, memb_ptr,
-                                           ilevel + 1, flags,
-                                           cb, app_key);
-        if(tmper.encoded == -1) return tmper;
-        er.encoded += tmper.encoded;
-    }
-
-    if(!xcan) ASN__TEXT_INDENT(1, ilevel - 1);
-
-    ASN__ENCODED_OK(er);
-cb_failed:
-    ASN__ENCODE_FAILED;
 }
