@@ -30,7 +30,7 @@ asn_TYPE_operation_t asn_OP_SET = {
 #endif  /* !defined(ASN_DISABLE_XER_SUPPORT) */
 #if !defined(ASN_DISABLE_JER_SUPPORT)
     SET_decode_jer,
-    SET_encode_jer,
+    SEQUENCE_encode_jer,
 #else
 	0,
     0,
