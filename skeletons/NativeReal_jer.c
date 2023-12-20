@@ -38,13 +38,18 @@ asn_enc_rval_t
  NativeReal_encode_jer(const asn_TYPE_descriptor_t *td, const void *sptr,
                       int ilevel, enum jer_encoder_flags_e flags,
                       asn_app_consume_bytes_f *cb, void *app_key) {
-    double d = NativeReal__get_double(td, sptr);
     asn_enc_rval_t er = {0,0,0};
+    double native; 
+    REAL_t tmpreal;
 
     (void)ilevel;
 
-    er.encoded = REAL__dump(d, flags, cb, app_key);
-    if(er.encoded < 0) ASN__ENCODE_FAILED;
+    native = NativeReal__get_double(td, sptr);
+    memset(&tmpreal, 0, sizeof(tmpreal));
+    if(asn_double2REAL(&tmpreal, native))
+        ASN__ENCODE_FAILED;
 
-    ASN__ENCODED_OK(er);
+    er = REAL_encode_jer(td, &tmpreal, ilevel, flags, cb, app_key);
+    ASN_STRUCT_FREE_CONTENTS_ONLY(asn_DEF_REAL, &tmpreal);
+    return er;
 }
