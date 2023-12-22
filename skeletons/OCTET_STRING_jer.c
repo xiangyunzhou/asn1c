@@ -53,42 +53,43 @@ static const struct OCTET_STRING__jer_escape_table_s {
     const char *string;
     int size;
 } OCTET_STRING__jer_escape_table[] = {
-#define	OSXET(s)	{ s, sizeof(s) - 1 }
-    { 0, 0 },  /* NULL */
-    { 0, 0 },  /* Start of header */
-    { 0, 0 },  /* Start of text */
-    { 0, 0 },  /* End of text */
-    { 0, 0 },  /* End of transmission */
-    { 0, 0 },  /* Enquiry */
-    { 0, 0 },  /* Ack */
-    { 0, 0 },  /* Bell */
-    OSXET("\134\142"),  /* \b */
-    OSXET("\134\164"),  /* \t */
-    OSXET("\134\156"),  /* \n */
-    { 0, 0 },  /* Vertical tab */
-    OSXET("\134\146"),  /* \f */
-    OSXET("\134\162"),  /* \r */
-    { 0, 0 },  /* Shift out */
-    { 0, 0 },  /* Shift in */
-    { 0, 0 },  /* Data link escape */
-    { 0, 0 },  /* Device control 1 */
-    { 0, 0 },  /* Device control 2 */
-    { 0, 0 },  /* Device control 3 */
-    { 0, 0 },  /* Device control 4 */
-    { 0, 0 },  /* Negative ack */
-    { 0, 0 },  /* Synchronous idle */
-    { 0, 0 },  /* End of transmission block */
-    { 0, 0 },  /* Cancel */
-    { 0, 0 },  /* End of medium */
-    { 0, 0 },  /* Substitute */
-    { 0, 0 },  /* Escape */
-    { 0, 0 },  /* File separator */
-    { 0, 0 },  /* Group separator */
-    { 0, 0 },  /* Record separator */
-    { 0, 0 },  /* Unit separator */
+#define OSXBT(s)  { "\\"s"", sizeof(s) + 1 - 1 }
+#define OSXUT(s)  { "\\u00"s"", sizeof(s) + 4 - 1 }
+    OSXUT("00"),  /* NULL */
+    OSXUT("01"),  /* Start of header */
+    OSXUT("02"),  /* Start of text */
+    OSXUT("03"),  /* End of text */
+    OSXUT("04"),  /* End of transmission */
+    OSXUT("05"),  /* Enquiry */
+    OSXUT("06"),  /* Ack */
+    OSXUT("07"),  /* Bell */
+    OSXBT("b"),   /* \b */
+    OSXBT("t"),   /* \t */
+    OSXBT("n"),   /* \n */
+    OSXUT("0b"),  /* Vertical tab */
+    OSXBT("f"),   /* \f */
+    OSXBT("r"),   /* \r */
+    OSXUT("0e"),  /* Shift out */
+    OSXUT("0f"),  /* Shift in */
+    OSXUT("10"),  /* Data link escape */
+    OSXUT("11"),  /* Device control 1 */
+    OSXUT("12"),  /* Device control 2 */
+    OSXUT("13"),  /* Device control 3 */
+    OSXUT("14"),  /* Device control 4 */
+    OSXUT("15"),  /* Negative ack */
+    OSXUT("16"),  /* Synchronous idle */
+    OSXUT("17"),  /* End of transmission block */
+    OSXUT("18"),  /* Cancel */
+    OSXUT("19"),  /* End of medium */
+    OSXUT("1a"),  /* Substitute */
+    OSXUT("1b"),  /* Escape */
+    OSXUT("1c"),  /* File separator */
+    OSXUT("1d"),  /* Group separator */
+    OSXUT("1e"),  /* Record separator */
+    OSXUT("1f"),  /* Unit separator */
     { 0, 0 },                           /* " " */
     { 0, 0 },                           /* ! */
-    OSXET("\134\042"),                  /* \" */
+    OSXBT("\""),                  /* \" */
     { 0, 0 },                           /* # */
     { 0, 0 },                           /* $ */
     { 0, 0 },                           /* % */
@@ -107,7 +108,7 @@ static const struct OCTET_STRING__jer_escape_table_s {
     {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}, /* QRSTUVWX */
     {0,0},{0,0},                                     /* YZ */
     { 0, 0 },  /* [ */
-    OSXET("\134\134"),  /* \\ */
+    OSXBT("\\"),  /* \\ */
 };
 
 static int
@@ -299,7 +300,7 @@ static ssize_t OCTET_STRING__convert_hexadecimal(void *sptr, const void *chunk_b
  * Something like strtod(), but with stricter rules.
  */
 static int
-OS__strtoent(int base, const char *buf, const char *end, int32_t *ret_value) {
+OS__strtoent(const char *buf, const char *end, int32_t *ret_value) {
 	const int32_t last_unicode_codepoint = 0x10ffff;
 	int32_t val = 0;
 	const char *p;
@@ -310,19 +311,16 @@ OS__strtoent(int base, const char *buf, const char *end, int32_t *ret_value) {
         switch(ch) {
         case 0x30: case 0x31: case 0x32: case 0x33: case 0x34:  /*01234*/
         case 0x35: case 0x36: case 0x37: case 0x38: case 0x39:  /*56789*/
-            val = val * base + (ch - 0x30);
+            val = val * 16 + (ch - 0x30);
             break;
         case 0x41: case 0x42: case 0x43:  /* ABC */
         case 0x44: case 0x45: case 0x46:  /* DEF */
-            val = val * base + (ch - 0x41 + 10);
+            val = val * 16 + (ch - 0x41 + 10);
             break;
         case 0x61: case 0x62: case 0x63:  /* abc */
         case 0x64: case 0x65: case 0x66:  /* def */
-            val = val * base + (ch - 0x61 + 10);
+            val = val * 16 + (ch - 0x61 + 10);
             break;
-        case 0x3b:  /* ';' */
-            *ret_value = val;
-            return (p - buf) + 1;
         default:
             return -1;  /* Character set error */
         }
@@ -333,7 +331,7 @@ OS__strtoent(int base, const char *buf, const char *end, int32_t *ret_value) {
         }
     }
 
-    *ret_value = -1;
+    *ret_value = val;
     return (p - buf);
 }
 
@@ -371,7 +369,7 @@ OCTET_STRING__convert_entrefs(void *sptr, const void *chunk_buf,
     buf = st->buf + st->size;
 
     /*
-     * Convert series of 0 and 1 into the octet string.
+     * Convert into the octet string.
      */
     for(; p < pend; p++) {
         int ch = *(const unsigned char *)p;
@@ -392,21 +390,16 @@ OCTET_STRING__convert_entrefs(void *sptr, const void *chunk_buf,
             ;
             const char *pval;  /* Pointer to start of digits */
             int32_t val = 0;  /* Entity reference value */
-            int base;
 
-            if(len == 2 /* "&#" */) goto want_more;
-            if(p[2] == 0x78 /* 'x' */)
-                pval = p + 3, base = 16;
-            else
-                pval = p + 2, base = 10;
-            len = OS__strtoent(base, pval, p + len, &val);
+            if(len - 6 < 0) goto want_more;
+            pval = p + 2;
+            len = OS__strtoent(pval, pval + 4, &val);
             if(len == -1) {
                 /* Invalid charset. Just copy verbatim. */
                 *buf++ = ch;
                 continue;
             }
-            if(!len || pval[len-1] != 0x3b) goto want_more;
-            assert(val > 0);
+            if(!len) goto want_more;
             p += (pval - p) + len - 1;  /* Advance past entref */
 
             if(val < 0x80) {
