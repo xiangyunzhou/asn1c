@@ -18,7 +18,6 @@ asn__format_to_callback(int (*cb)(const void *, size_t, void *key), void *key,
         if(wrote < (ssize_t)buf_size) {
             if(wrote < 0) {
                 if(buf != scratch) FREEMEM(buf);
-                va_end(args);
                 return -1;
             }
             break;
@@ -28,14 +27,12 @@ asn__format_to_callback(int (*cb)(const void *, size_t, void *key), void *key,
         if(buf == scratch) {
             buf = MALLOC(buf_size);
             if(!buf) {
-              va_end(args);
               return -1;
             }
         } else {
             void *p = REALLOC(buf, buf_size);
             if(!p) {
                 FREEMEM(buf);
-                va_end(args);
                 return -1;
             }
             buf = p;
@@ -44,7 +41,6 @@ asn__format_to_callback(int (*cb)(const void *, size_t, void *key), void *key,
 
     cb_ret = cb(buf, wrote, key);
     if(buf != scratch) FREEMEM(buf);
-    va_end(args);
     if(cb_ret < 0) {
         return -1;
     }
