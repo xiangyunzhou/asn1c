@@ -145,11 +145,10 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                 ctx->phase = 3;  /* Phase out */
                 RETURN(RC_OK);
             }
-        case JCK_OEND:
             /* Fall through */
+        case JCK_OEND:
         case JCK_KEY:
         case JCK_COMMA:
-
         case JCK_ASTART:
             if(ctx->phase == 0) {
                 JER_ADVANCE(ch_size);
