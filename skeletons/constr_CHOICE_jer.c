@@ -186,6 +186,7 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                 ctx->phase = 1;  /* Processing body phase */
                 continue;
             }
+            /* Fall through */
         case JCK_KEY:
         case JCK_UNKNOWN:
 
