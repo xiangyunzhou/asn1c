@@ -298,7 +298,7 @@ asn_enc_rval_t SEQUENCE_encode_jer(const asn_TYPE_descriptor_t *td, const void *
                     int ilevel, enum jer_encoder_flags_e flags,
                     asn_app_consume_bytes_f *cb, void *app_key) {
     asn_enc_rval_t er = {0,0,0};
-    int xcan = 0;
+    int jmin = (flags & JER_F_MINIFIED);
     asn_TYPE_descriptor_t *tmp_def_val_td = 0;
     void *tmp_def_val = 0;
     size_t edx;
@@ -344,8 +344,12 @@ asn_enc_rval_t SEQUENCE_encode_jer(const asn_TYPE_descriptor_t *td, const void *
           bAddComma = 0;
         }
 
-        if(!xcan) ASN__TEXT_INDENT(1, ilevel+1);
-        ASN__CALLBACK3("\"", 1, mname, mlen, "\": ", 3);
+        if(!jmin) {
+            ASN__TEXT_INDENT(1, ilevel + 1);
+            ASN__CALLBACK3("\"", 1, mname, mlen, "\": ", 3);
+        } else {
+            ASN__CALLBACK3("\"", 1, mname, mlen, "\":", 2);
+        }
 
         /* Print the member itself */
         tmper = elm->type->op->jer_encoder(elm->type, memb_ptr, ilevel + 1,
@@ -360,7 +364,7 @@ asn_enc_rval_t SEQUENCE_encode_jer(const asn_TYPE_descriptor_t *td, const void *
           bAddComma = 1;
         }
     }
-    if(!xcan) ASN__TEXT_INDENT(1, ilevel);
+    if(!jmin) ASN__TEXT_INDENT(1, ilevel);
     ASN__CALLBACK("}", 1);
 
 
