@@ -71,7 +71,7 @@ typedef enum jer_pbd_rval(jer_primitive_body_decoder_f)(
 asn_dec_rval_t jer_decode_primitive(
     const asn_codec_ctx_t *opt_codec_ctx,
     const asn_TYPE_descriptor_t *type_descriptor, void **struct_ptr,
-    size_t struct_size, const char *opt_mname, const void *buf_ptr, size_t size,
+    size_t struct_size, const void *buf_ptr, size_t size,
     jer_primitive_body_decoder_f *prim_body_decoder);
 #endif  /* !defined(ASN_DISABLE_JER_SUPPORT) */
 

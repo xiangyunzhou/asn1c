@@ -13,13 +13,12 @@
 asn_dec_rval_t
 NativeReal_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                       const asn_TYPE_descriptor_t *td, void **sptr,
-                      const char *opt_mname, const void *buf_ptr, size_t size) {
+                      const void *buf_ptr, size_t size) {
     asn_dec_rval_t rval;
     REAL_t st = { 0, 0 };
     REAL_t *stp = &st;
 
-    rval = REAL_decode_jer(opt_codec_ctx, td, (void **)&stp, opt_mname,
-                           buf_ptr, size);
+    rval = REAL_decode_jer(opt_codec_ctx, td, (void **)&stp, buf_ptr, size);
     if(rval.code == RC_OK) {
         double d;
         if(asn_REAL2double(&st, &d) || NativeReal__set(td, sptr, d) < 0) {

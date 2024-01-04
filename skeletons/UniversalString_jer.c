@@ -10,12 +10,10 @@
 asn_dec_rval_t
 UniversalString_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                            const asn_TYPE_descriptor_t *td, void **sptr,
-                           const char *opt_mname, const void *buf_ptr,
-                           size_t size) {
+                           const void *buf_ptr, size_t size) {
     asn_dec_rval_t rc;
 
-    rc = OCTET_STRING_decode_jer_utf8(opt_codec_ctx, td, sptr, opt_mname,
-                                      buf_ptr, size);
+    rc = OCTET_STRING_decode_jer_utf8(opt_codec_ctx, td, sptr, buf_ptr, size);
     if(rc.code == RC_OK) {
         /*
          * Now we have a whole string in UTF-8 format.

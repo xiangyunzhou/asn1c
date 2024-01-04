@@ -40,7 +40,7 @@
 asn_dec_rval_t
 SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                     const asn_TYPE_descriptor_t *td, void **struct_ptr,
-                    const char *opt_mname, const void *ptr, size_t size) {
+                    const void *ptr, size_t size) {
     /*
      * Bring closer parts of structure description.
      */
@@ -108,7 +108,7 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             } else {
                 /* Invoke the inner type decoder, m.b. multiple times */
                 tmprval = elm->type->op->jer_decoder(opt_codec_ctx,
-                                                     elm->type, memb_ptr2, elm->name,
+                                                     elm->type, memb_ptr2,
                                                      ptr, size);
             }
             JER_ADVANCE(tmprval.consumed);

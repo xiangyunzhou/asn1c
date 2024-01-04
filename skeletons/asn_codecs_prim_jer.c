@@ -117,10 +117,9 @@ jer_decode__primitive_body(void *key, const void *chunk_buf, size_t chunk_size, 
 asn_dec_rval_t
 jer_decode_primitive(const asn_codec_ctx_t *opt_codec_ctx,
                      const asn_TYPE_descriptor_t *td, void **sptr,
-                     size_t struct_size, const char *opt_mname,
+                     size_t struct_size,
                      const void *buf_ptr, size_t size,
                      jer_primitive_body_decoder_f *prim_body_decoder) {
-    const char *xml_tag = opt_mname ? opt_mname : td->xml_tag;
     asn_struct_ctx_t s_ctx;
     struct jdp_arg_s s_arg;
     asn_dec_rval_t rc;
@@ -141,7 +140,7 @@ jer_decode_primitive(const asn_codec_ctx_t *opt_codec_ctx,
     s_arg.want_more = 0;
 
     rc = jer_decode_general(opt_codec_ctx, &s_ctx, &s_arg,
-                            xml_tag, buf_ptr, size,
+                            buf_ptr, size,
                             jer_decode__unexpected_tag,
                             jer_decode__primitive_body);
     switch(rc.code) {

@@ -52,11 +52,11 @@ OBJECT_IDENTIFIER__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
 asn_dec_rval_t
 OBJECT_IDENTIFIER_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                              const asn_TYPE_descriptor_t *td, void **sptr,
-                             const char *opt_mname, const void *buf_ptr,
+                             const void *buf_ptr,
                              size_t size) {
     return jer_decode_primitive(opt_codec_ctx, td,
-        sptr, sizeof(OBJECT_IDENTIFIER_t), opt_mname,
-            buf_ptr, size, OBJECT_IDENTIFIER__jer_body_decode);
+        sptr, sizeof(OBJECT_IDENTIFIER_t),
+        buf_ptr, size, OBJECT_IDENTIFIER__jer_body_decode);
 }
 
 asn_enc_rval_t

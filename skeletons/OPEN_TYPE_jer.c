@@ -103,7 +103,7 @@ OPEN_TYPE_jer_get(const asn_codec_ctx_t *opt_codec_ctx,
         + elm->type->elements[selected.presence_index - 1].memb_offset;
 
     rv = selected.type_descriptor->op->jer_decoder(
-        opt_codec_ctx, selected.type_descriptor, &inner_value, NULL, ptr, size);
+        opt_codec_ctx, selected.type_descriptor, &inner_value, ptr, size);
     ADVANCE(rv.consumed);
     rv.consumed = 0;
     switch(rv.code) {

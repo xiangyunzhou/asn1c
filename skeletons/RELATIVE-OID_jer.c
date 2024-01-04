@@ -72,10 +72,9 @@ RELATIVE_OID__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
 asn_dec_rval_t
 RELATIVE_OID_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                         const asn_TYPE_descriptor_t *td, void **sptr,
-                        const char *opt_mname, const void *buf_ptr,
-                        size_t size) {
+                        const void *buf_ptr, size_t size) {
     return jer_decode_primitive(opt_codec_ctx, td,
-                                sptr, sizeof(RELATIVE_OID_t), opt_mname,
+                                sptr, sizeof(RELATIVE_OID_t),
                                 buf_ptr, size, RELATIVE_OID__jer_body_decode);
 }
 
