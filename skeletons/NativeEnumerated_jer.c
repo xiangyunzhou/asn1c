@@ -12,8 +12,7 @@
 asn_dec_rval_t
 NativeEnumerated_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                          const asn_TYPE_descriptor_t *td, void **sptr,
-                         const char *opt_mname, const void *buf_ptr,
-                         size_t size) {
+                         const void *buf_ptr, size_t size) {
     const asn_INTEGER_specifics_t *specs =
         (const asn_INTEGER_specifics_t *)td->specifics;
     asn_dec_rval_t rval;
@@ -27,8 +26,7 @@ NativeEnumerated_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
     }
 
     memset(&st, 0, sizeof(st));
-    rval = ENUMERATED_decode_jer(opt_codec_ctx, td, &st_ptr,
-                              opt_mname, buf_ptr, size);
+    rval = ENUMERATED_decode_jer(opt_codec_ctx, td, &st_ptr, buf_ptr, size);
     if(rval.code == RC_OK) {
         long l;
         if((specs&&specs->field_unsigned)

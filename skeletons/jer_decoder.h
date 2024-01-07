@@ -31,7 +31,6 @@ asn_dec_rval_t jer_decode(
 typedef asn_dec_rval_t(jer_type_decoder_f)(
     const asn_codec_ctx_t *opt_codec_ctx,
     const struct asn_TYPE_descriptor_s *type_descriptor, void **struct_ptr,
-    const char *opt_mname, /* Member name */
     const void *buf_ptr, size_t size);
 
 /*******************************
@@ -48,7 +47,6 @@ asn_dec_rval_t jer_decode_general(
     const asn_codec_ctx_t *opt_codec_ctx,
     asn_struct_ctx_t *ctx, /* Type decoder context */
     void *struct_key,      /* Treated as opaque pointer */
-    const char *json_key,   /* Expected XML tag name */
     const void *buf_ptr, size_t size,
     int (*opt_unexpected_tag_decoder)(void *struct_key, const void *chunk_buf,
                                       size_t chunk_size),

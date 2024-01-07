@@ -827,8 +827,7 @@ xer_decode_general(const asn_codec_ctx_t *opt_codec_ctx, asn_struct_ctx_t *ctx,
 
 asn_dec_rval_t
 jer_decode_general(const asn_codec_ctx_t *opt_codec_ctx, asn_struct_ctx_t *ctx,
-                   void *struct_key, const char *json_key, const void *buf_ptr,
-                   size_t size,
+                   void *struct_key, const void *buf_ptr, size_t size,
                    int (*otd)(void *struct_key, const void *chunk_buf,
                               size_t chunk_size),
                    ssize_t (*br)(void *struct_key, const void *chunk_buf,
@@ -837,7 +836,6 @@ jer_decode_general(const asn_codec_ctx_t *opt_codec_ctx, asn_struct_ctx_t *ctx,
     (void)opt_codec_ctx;
     (void)ctx;
     (void)struct_key;
-    (void)json_key;
     (void)buf_ptr;
     (void)size;
     (void)otd;

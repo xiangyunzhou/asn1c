@@ -35,7 +35,7 @@ jer_decode(const asn_codec_ctx_t *opt_codec_ctx,
 	/*
 	 * Invoke type-specific decoder.
 	 */
-	return td->op->jer_decoder(opt_codec_ctx, td, struct_ptr, 0, buffer, size);
+	return td->op->jer_decoder(opt_codec_ctx, td, struct_ptr, buffer, size);
 }
 
 
@@ -210,7 +210,6 @@ asn_dec_rval_t
 jer_decode_general(const asn_codec_ctx_t *opt_codec_ctx,
 	asn_struct_ctx_t *ctx,	/* Type decoder context */
 	void *struct_key,
-	const char *json_key,	/* Expected JSON key */
 	const void *buf_ptr, size_t size,
 	int (*opt_unexpected_key_decoder)
 		(void *struct_key, const void *chunk_buf, size_t chunk_size),
@@ -223,6 +222,7 @@ jer_decode_general(const asn_codec_ctx_t *opt_codec_ctx,
 	ssize_t consumed_myself = 0;
 
 	(void)opt_codec_ctx;
+    (void)opt_unexpected_key_decoder;
 
 	/*
 	 * Phases of jer/JSON processing:

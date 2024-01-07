@@ -32,7 +32,7 @@
 asn_dec_rval_t
 CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                   const asn_TYPE_descriptor_t *td, void **struct_ptr,
-                  const char *opt_mname, const void *buf_ptr, size_t size) {
+                  const void *buf_ptr, size_t size) {
     /*
      * Bring closer parts of structure description.
      */
@@ -99,7 +99,6 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             /* Start/Continue decoding the inner member */
             tmprval = elm->type->op->jer_decoder(opt_codec_ctx,
                                                  elm->type, memb_ptr2,
-                                                 elm->name,
                                                  buf_ptr, size);
             JER_ADVANCE(tmprval.consumed);
             ASN_DEBUG("JER/CHOICE: itdf: [%s] code=%d",

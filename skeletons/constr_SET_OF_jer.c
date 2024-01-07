@@ -32,13 +32,12 @@
 asn_dec_rval_t
 SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                   const asn_TYPE_descriptor_t *td, void **struct_ptr,
-                  const char *opt_mname, const void *buf_ptr, size_t size) {
+                  const void *buf_ptr, size_t size) {
     /*
      * Bring closer parts of structure description.
      */
     const asn_SET_OF_specifics_t *specs = (const asn_SET_OF_specifics_t *)td->specifics;
     const asn_TYPE_member_t *element = td->elements;
-    const char *elm_tag;
 
     /*
      * ... and parts of the structure being constructed.
@@ -55,14 +54,6 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
     if(st == 0) {
         st = *struct_ptr = CALLOC(1, specs->struct_size);
         if(st == 0) RETURN(RC_FAIL);
-    }
-
-    /* Which tag is expected for the downstream */
-    if(specs->as_XMLValueList) {
-        elm_tag = (specs->as_XMLValueList == 1) ? 0 : "";
-    } else {
-        elm_tag = (*element->name)
-                ? element->name : element->type->xml_tag;
     }
 
     /*
@@ -88,10 +79,11 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             asn_dec_rval_t tmprval = {RC_OK, 0};
 
             /* Invoke the inner type decoder, m.b. multiple times */
-            ASN_DEBUG("JER/SET OF element [%s]", elm_tag);
+            ASN_DEBUG("JER/SET OF element [%s]", elm_tag(*element->name) ? 
+                      element->name : element->type->xml_tag);
             tmprval = element->type->op->jer_decoder(opt_codec_ctx,
                                                      element->type,
-                                                     &ctx->ptr, elm_tag,
+                                                     &ctx->ptr,
                                                      buf_ptr, size);
             if(tmprval.code == RC_OK) {
                 asn_anonymous_set_ *list = _A_SET_FROM_VOID(st);

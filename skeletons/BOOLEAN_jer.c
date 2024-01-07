@@ -18,6 +18,7 @@ BOOLEAN__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
     const char *p = (const char *)chunk_buf;
 
     (void)td;
+    (void)chunk_size;
 
     if(p[0] == 't' /* 'true' */) {
         *st = 1;
@@ -34,9 +35,9 @@ BOOLEAN__jer_body_decode(const asn_TYPE_descriptor_t *td, void *sptr,
 asn_dec_rval_t
 BOOLEAN_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
                    const asn_TYPE_descriptor_t *td, void **sptr,
-                   const char *opt_mname, const void *buf_ptr, size_t size) {
+                   const void *buf_ptr, size_t size) {
     return jer_decode_primitive(opt_codec_ctx, td,
-                                sptr, sizeof(BOOLEAN_t), opt_mname, buf_ptr, size,
+                                sptr, sizeof(BOOLEAN_t), buf_ptr, size,
                                 BOOLEAN__jer_body_decode);
 }
 
