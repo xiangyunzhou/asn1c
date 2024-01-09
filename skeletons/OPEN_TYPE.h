@@ -77,7 +77,10 @@ asn_dec_rval_t OPEN_TYPE_oer_get(
     asn_TYPE_member_t *element, const void *ptr,
     size_t size);
 #define OPEN_TYPE_decode_oer NULL
-#define OPEN_TYPE_encode_oer CHOICE_encode_oer
+asn_enc_rval_t OPEN_TYPE_encode_oer(
+    const asn_TYPE_descriptor_t *type_descriptor,
+    const asn_oer_constraints_t *constraints, const void *struct_ptr,
+    asn_app_consume_bytes_f *consume_bytes_cb, void *app_key);
 #endif  /* !defined(ASN_DISABLE_OER_SUPPORT) */
 
 #if !defined(ASN_DISABLE_UPER_SUPPORT)
