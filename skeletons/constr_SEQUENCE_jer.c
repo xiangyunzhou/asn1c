@@ -145,8 +145,8 @@ SEQUENCE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
         }
 
         scv = jer_check_sym(ptr, ch_size, NULL);
-        ASN_DEBUG("JER/SEQUENCE: scv = %d, ph=%d",
-                  scv, ctx->phase);
+        ASN_DEBUG("JER/SEQUENCE: scv = %d, ph=%d [%s]",
+                  scv, ctx->phase, json_key);
 
 
         /* Skip the extensions section */
