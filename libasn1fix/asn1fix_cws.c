@@ -298,8 +298,6 @@ asn1f_parse_class_object(arg_t *arg) {
 
 #define	SKIPSPACES \
     for(; buf < bend && isspace(*buf); buf++)
-#define	SKIPSPACES_AND_COMMA \
-    for(; buf < bend && (isspace(*buf) || *buf==','); buf++)
 
 static int
 _asn1f_parse_class_object_data_default_syntx(arg_t *arg, asn1p_expr_t *eclass,
@@ -317,6 +315,10 @@ _asn1f_parse_class_object_data_default_syntx(arg_t *arg, asn1p_expr_t *eclass,
     asn1p_expr_t* cm;
     SKIPSPACES;
     for (; buf < bend; ++buf) {
+        /* find possible literal PrimitiveFieldName */
+        if(*buf != '&') {
+            continue;
+        }
         TQ_FOR(cm, &(eclass->members), next) {
             /* PrimitiveFieldName */
 			int id_len = strlen(cm->Identifier);
@@ -344,7 +346,7 @@ _asn1f_parse_class_object_data_default_syntx(arg_t *arg, asn1p_expr_t *eclass,
                 ret = _asn1f_assign_cell_value(arg, cell, buf, p, counter);
                 if(ret) return ret;
                 buf = p;
-                SKIPSPACES_AND_COMMA;
+                SKIPSPACES;
                 if(newpos) *newpos = buf;
 
                 break;
