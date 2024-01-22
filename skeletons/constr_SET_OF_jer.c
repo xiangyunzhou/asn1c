@@ -79,7 +79,8 @@ SET_OF_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             asn_dec_rval_t tmprval = {RC_OK, 0};
 
             /* Invoke the inner type decoder, m.b. multiple times */
-            ASN_DEBUG("JER/SET OF element [%s]", element->type->xml_tag);
+            ASN_DEBUG("JER/SET OF element [%s]", 
+                    (*element->name) ? element->name : element->type->xml_tag);
             tmprval = element->type->op->jer_decoder(opt_codec_ctx,
                                                      element->type,
                                                      &ctx->ptr,

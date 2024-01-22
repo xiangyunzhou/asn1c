@@ -140,7 +140,7 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
         }
 
         scv = jer_check_sym(buf_ptr, ch_size, NULL);
-        ASN_DEBUG("JER/CHOICE checked [%c%c%c%c] vs [%s], scv=%d",
+        ASN_DEBUG("JER/CHOICE checked [%c%c%c%c] of [%s], scv=%d",
                   ch_size>0?((const uint8_t *)buf_ptr)[0]:'?',
                   ch_size>1?((const uint8_t *)buf_ptr)[1]:'?',
                   ch_size>2?((const uint8_t *)buf_ptr)[2]:'?',
@@ -248,7 +248,7 @@ CHOICE_decode_jer(const asn_codec_ctx_t *opt_codec_ctx,
             break;
         }
 
-        ASN_DEBUG("Unexpected JSON key [%c%c%c%c] in CHOICE [%s]"
+        ASN_DEBUG("Unexpected JSON token [%c%c%c%c] in CHOICE [%s]"
                   " (ph=%d)",
                   ch_size>0?((const uint8_t *)buf_ptr)[0]:'?',
                   ch_size>1?((const uint8_t *)buf_ptr)[1]:'?',
