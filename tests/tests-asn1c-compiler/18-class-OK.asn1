@@ -25,7 +25,7 @@ BEGIN
 
 	operator-plus FUNCTION ::= {
 		&ArgType		Pair,
-		&SupportedArguments	{ PosPair | NegPair }
+		&SupportedArguments	{ PosPair | NegPair },
 		&ResultType		INTEGER,
 		&result-if-error	0,
 		&code			1
