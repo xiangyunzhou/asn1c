@@ -33,6 +33,7 @@ extern "C" {
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define OPEN_TYPE_compare CHOICE_compare
+#define OPEN_TYPE_copy    CHOICE_copy
 
 #define OPEN_TYPE_constraint CHOICE_constraint
 

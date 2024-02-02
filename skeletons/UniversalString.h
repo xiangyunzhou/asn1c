@@ -24,6 +24,7 @@ asn_struct_print_f UniversalString_print;  /* Human-readable output */
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define UniversalString_compare OCTET_STRING_compare
+#define UniversalString_copy    OCTET_STRING_copy
 
 asn_constr_check_f UniversalString_constraint;
 

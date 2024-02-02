@@ -31,6 +31,7 @@ asn_struct_print_f BIT_STRING_print;  /* Human-readable output */
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 asn_struct_compare_f BIT_STRING_compare;
+asn_struct_copy_f    BIT_STRING_copy;
 
 asn_constr_check_f BIT_STRING_constraint;
 

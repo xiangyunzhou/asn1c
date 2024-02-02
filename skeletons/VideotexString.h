@@ -23,6 +23,7 @@ extern asn_TYPE_operation_t asn_OP_VideotexString;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define VideotexString_compare OCTET_STRING_compare
+#define VideotexString_copy    OCTET_STRING_copy
 
 #define VideotexString_constraint asn_generic_unknown_constraint
 

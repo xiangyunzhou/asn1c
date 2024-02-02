@@ -23,6 +23,7 @@ extern asn_TYPE_operation_t asn_OP_GeneralString;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define GeneralString_compare OCTET_STRING_compare
+#define GeneralString_copy    OCTET_STRING_copy
 
 #define GeneralString_constraint asn_generic_unknown_constraint
 

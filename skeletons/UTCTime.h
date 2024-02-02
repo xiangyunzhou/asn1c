@@ -23,6 +23,7 @@ asn_struct_print_f UTCTime_print;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 asn_struct_compare_f UTCTime_compare;
+#define UTCTime_copy OCTET_STRING_copy
 
 asn_constr_check_f UTCTime_constraint;
 

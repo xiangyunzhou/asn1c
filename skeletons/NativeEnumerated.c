@@ -26,6 +26,7 @@ asn_TYPE_operation_t asn_OP_NativeEnumerated = {
     0,
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
     NativeInteger_compare,
+    NativeInteger_copy,
 #if !defined(ASN_DISABLE_BER_SUPPORT)
     NativeInteger_decode_ber,
     NativeInteger_encode_der,

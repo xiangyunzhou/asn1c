@@ -144,6 +144,16 @@ typedef int (asn_struct_compare_f)(
 		const void *struct_B);
 
 /*
+ * Copies struct B into struct A.
+ * Allocates memory for struct A, if necessary.
+ */
+typedef int (asn_struct_copy_f)(
+		const struct asn_TYPE_descriptor_s *type_descriptor,
+		void **struct_A,
+		const void *struct_B
+        );
+
+/*
  * Return the outmost tag of the type.
  * If the type is untagged CHOICE, the dynamic operation is performed.
  * NOTE: This function pointer type is only useful internally.
@@ -175,6 +185,7 @@ typedef struct asn_TYPE_operation_s {
     asn_struct_free_f *free_struct;     /* Free the structure */
     asn_struct_print_f *print_struct;   /* Human readable output */
     asn_struct_compare_f *compare_struct; /* Compare two structures */
+    asn_struct_copy_f *copy_struct;       /* Copy method */
     ber_type_decoder_f *ber_decoder;      /* Generic BER decoder */
     der_type_encoder_f *der_encoder;      /* Canonical DER encoder */
     xer_type_decoder_f *xer_decoder;      /* Generic XER decoder */

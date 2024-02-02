@@ -23,6 +23,7 @@ extern asn_TYPE_operation_t asn_OP_T61String;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define T61String_compare OCTET_STRING_compare
+#define T61String_copy    OCTET_STRING_copy   
 
 #define T61String_constraint asn_generic_unknown_constraint
 

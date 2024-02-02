@@ -23,6 +23,7 @@ extern asn_TYPE_operation_t asn_OP_TeletexString;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define TeletexString_compare OCTET_STRING_compare
+#define TeletexString_copy    OCTET_STRING_copy   
 
 #define TeletexString_constraint asn_generic_unknown_constraint
 

@@ -28,6 +28,7 @@ asn_struct_print_f RELATIVE_OID_print;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define RELATIVE_OID_compare OCTET_STRING_compare
+#define RELATIVE_OID_copy    OCTET_STRING_copy
 
 #define RELATIVE_OID_constraint asn_generic_no_constraint
 

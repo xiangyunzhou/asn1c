@@ -23,6 +23,7 @@ extern asn_TYPE_operation_t asn_OP_VisibleString;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define VisibleString_compare OCTET_STRING_compare
+#define VisibleString_copy    OCTET_STRING_copy   
 
 asn_constr_check_f VisibleString_constraint;
 

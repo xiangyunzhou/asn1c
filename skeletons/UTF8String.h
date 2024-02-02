@@ -23,6 +23,7 @@ asn_struct_print_f UTF8String_print;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define UTF8String_compare OCTET_STRING_compare
+#define UTF8String_copy    OCTET_STRING_copy
 
 asn_constr_check_f UTF8String_constraint;
 

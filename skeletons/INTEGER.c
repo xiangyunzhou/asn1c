@@ -22,6 +22,7 @@ asn_TYPE_operation_t asn_OP_INTEGER = {
     0,
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
     INTEGER_compare,
+    INTEGER_copy,
 #if !defined(ASN_DISABLE_BER_SUPPORT)
     ber_decode_primitive,
     INTEGER_encode_der,
@@ -737,4 +738,41 @@ INTEGER_compare(const asn_TYPE_descriptor_t *td, const void *aptr,
         return 1;
     }
 
+}
+
+int
+INTEGER_copy(const asn_TYPE_descriptor_t *td, void **aptr,
+                     const void *bptr) {
+    (void)td;
+    INTEGER_t *a = *aptr;
+    const INTEGER_t *b = bptr;
+
+    if(!b) {
+        if(a) {
+            FREEMEM(a->buf);
+            FREEMEM(a);
+            *aptr = 0;
+        }
+        return 0;
+    }
+
+    if(!a) {
+        a = *aptr = CALLOC(1, sizeof(*a));
+        if(!a) return -1;
+    }
+
+    if(b->size) {
+        uint8_t* buf = MALLOC(b->size);
+        if(!buf) return -1;
+        memcpy(buf, b->buf, b->size);
+        FREEMEM(a->buf);
+        a->buf = buf;
+        a->size = b->size;
+    } else {
+        FREEMEM(a->buf);
+        a->buf = 0;
+        a->size = 0;
+    }
+
+    return 0;
 }
