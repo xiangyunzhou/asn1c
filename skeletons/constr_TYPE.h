@@ -302,6 +302,17 @@ int asn_fprint(FILE *stream, /* Destination stream descriptor */
                const asn_TYPE_descriptor_t *td, /* ASN.1 type descriptor */
                const void *struct_ptr);         /* Structure to be printed */
 
+/*
+ * Copies a source structure (struct_src) into destination structure 
+ * (struct_dst). Allocates memory for the destination structure, if necessary.
+ * RETURN VALUES:
+ *   0: Copy OK.
+ * 	-1: Problem copying the structure.
+ */
+int asn_copy(const asn_TYPE_descriptor_t *td, /* ASN.1 type descriptor */
+             void **struct_dst,               /* Structure to be populated */
+             const void *struct_src);         /* Structure to be copied */
+
 #ifdef __cplusplus
 }
 #endif
