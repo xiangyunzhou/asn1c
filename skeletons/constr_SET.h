@@ -52,6 +52,7 @@ asn_struct_print_f SET_print;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 asn_struct_compare_f SET_compare;
+asn_struct_copy_f    SET_copy;
 
 asn_constr_check_f SET_constraint;
 

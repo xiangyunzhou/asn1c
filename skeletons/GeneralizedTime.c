@@ -182,6 +182,7 @@ asn_TYPE_operation_t asn_OP_GeneralizedTime = {
     0,
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
     GeneralizedTime_compare,
+    GeneralizedTime_copy,
 #if !defined(ASN_DISABLE_BER_SUPPORT)
     OCTET_STRING_decode_ber,  /* Implemented in terms of OCTET STRING */
     GeneralizedTime_encode_der,

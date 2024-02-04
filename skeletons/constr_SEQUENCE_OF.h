@@ -23,6 +23,7 @@ extern "C" {
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 asn_struct_compare_f SEQUENCE_OF_compare;
+#define SEQUENCE_OF_copy SET_OF_copy
 
 #define SEQUENCE_OF_constraint SET_OF_constraint
 

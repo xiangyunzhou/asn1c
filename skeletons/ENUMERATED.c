@@ -20,6 +20,7 @@ asn_TYPE_operation_t asn_OP_ENUMERATED = {
     0,
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
     INTEGER_compare,  /* Implemented in terms of INTEGER */
+    INTEGER_copy,  /* Implemented in terms of INTEGER */
 #if !defined(ASN_DISABLE_BER_SUPPORT)
     ber_decode_primitive,
     INTEGER_encode_der,  /* Implemented in terms of INTEGER */

@@ -24,6 +24,7 @@ extern asn_TYPE_operation_t asn_OP_ISO646String;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define ISO646String_compare OCTET_STRING_compare
+#define ISO646String_copy    OCTET_STRING_copy   
 
 #define ISO646String_constraint VisibleString_constraint
 

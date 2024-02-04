@@ -29,6 +29,7 @@ extern asn_TYPE_operation_t asn_OP_NativeEnumerated;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define NativeEnumerated_compare NativeInteger_compare
+#define NativeEnumerated_copy    NativeInteger_copy
 
 #define NativeEnumerated_constraint asn_generic_no_constraint
 

@@ -23,6 +23,7 @@ extern asn_TYPE_operation_t asn_OP_NumericString;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 #define NumericString_compare OCTET_STRING_compare
+#define NumericString_copy    OCTET_STRING_copy
 
 asn_constr_check_f NumericString_constraint;
 

@@ -47,6 +47,7 @@ asn_struct_print_f INTEGER_print;
 #endif  /* !defined(ASN_DISABLE_PRINT_SUPPORT) */
 
 asn_struct_compare_f INTEGER_compare;
+asn_struct_copy_f INTEGER_copy;
 
 #define INTEGER_constraint asn_generic_no_constraint
 
