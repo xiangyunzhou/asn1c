@@ -53,7 +53,7 @@ INTEGER_decode_aper(const asn_codec_ctx_t *opt_codec_ctx,
         /* #10.5.6 */
         ASN_DEBUG("Integer with range %d bits", ct->range_bits);
         if(ct->range_bits >= 0) {
-            if (ct->range_bits > 16) {
+            if (ct->range_bits > 16 && strcmp(td->name, "MaxDataBurstVolume") != 0) { // workaround for f1ap
                 int max_range_bytes = (ct->range_bits >> 3) +
                                       (((ct->range_bits % 8) > 0) ? 1 : 0);
                 int length = 0, i;
